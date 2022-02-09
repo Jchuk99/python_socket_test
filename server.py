@@ -19,13 +19,21 @@ def handle_client(conn, addr):
 
     connected = True
     while connected:
-        msg_length = conn.recv(HEADER).decode('utf-8')
+        msg = conn.recv(HEADER).decode('utf-8')
         # blank message is sent the first time we connect, make sure we get actual message
-        if msg_length:
-            msg_length = int(msg_length)
-            msg = conn.recv(msg_length).decode('utf-8')
-            print(f"[{addr}] {msg}")
-            conn.send("Msg received".encode('utf-8'))
+        if msg:
+            # strip padded part of buffer away
+            header = msg.strip().split('|', 1)
+            msg_length = int(header[0])
+            msg_type = header[1]
+
+            if msg_type == 'TEL':
+                print("sending telemetry data")
+                conn.send("Telemetry data:".encode('utf-8'))    
+            elif msg_type == 'MAP':
+                print("sending map data")
+                conn.send("Map data:".encode('utf-8'))    
+
             if msg == DISCONNECT_MESSAGE:
                 connected = False
 
