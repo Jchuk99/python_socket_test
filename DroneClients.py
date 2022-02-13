@@ -2,6 +2,7 @@ from time import sleep
 from threading import Thread
 import threading, queue
 import socket
+import numpy as np
 
 class DroneClients:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
@@ -24,8 +25,9 @@ class DroneClients:
         PORT = 5050
         SERVER = "10.0.0.101"
         self.ADDR = (server, port)
+        self.current_lidar_reading = np.empty((1, 3))
 
-
+    def start(self):
         self.telemetry_client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.telemetry_client.connect(self.ADDR)
 
@@ -49,6 +51,7 @@ class DroneClients:
         self.request_clients = [self.telemetry_client, self.map_client]
 
     def run(self):
+        self.start()
         self.lock.acquire()
         try:
             self.is_running = True
@@ -85,7 +88,19 @@ class DroneClients:
                 # dont have to send this everytime, think bout it later
                 self.send_message(client, str(len(msg)).encode('utf-8'), msg )
                 #depending on message either pickle a map or telemetry object
-                print(client.recv(2048).decode('utf-8'))
+                
+                if (msg == b'MAP'):
+                    arr = np.fromstring(client.recv(6000), dtype=float)
+                    if arr.size % 3 == 0:
+                        new = np.reshape(arr, (int(arr.size / 3), 3))
+                        self.current_lidar_reading = new
+                        # print()
+                        # for i in range(1, arr.size, 3):
+                        #     if (i + 1 < arr.size):
+                        #         self.current_lidar_reading[0].append(arr[i])
+                        #         self.current_lidar_reading[1].append(arr[i + 1])
+                else:
+                    print(client.recv(2048).decode('utf-8'))
                 sleep(1)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")
