@@ -94,11 +94,6 @@ class DroneClients:
                     if arr.size % 3 == 0:
                         new = np.reshape(arr, (int(arr.size / 3), 3))
                         self.current_lidar_reading = new
-                        # print()
-                        # for i in range(1, arr.size, 3):
-                        #     if (i + 1 < arr.size):
-                        #         self.current_lidar_reading[0].append(arr[i])
-                        #         self.current_lidar_reading[1].append(arr[i + 1])
                 else:
                     print(client.recv(2048).decode('utf-8'))
                 sleep(1)
