@@ -1,49 +1,31 @@
 import sys
 from time import sleep
-import numpy as np
 import threading, queue
+import pickle
 import socket
-import subprocess
-from rplidar import RPLidar
 
 # this class is meant to be run in a seperate thread
 class DroneServer:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
     # communicate with drone
-    def __init__(self, env_map, telemetry_data, message_queue):
-        self.env_map = env_map
+    def __init__(self, drone_map, telemetry_data, message_queue):
+        # an already running drone map
+        self.drone_map = drone_map
         self.telemetry_data = telemetry_data
         self.message_queue = message_queue
         self.lock = threading.Lock()
         self.is_running = False
-        # self.ADDR = (server, port number)
         self.clients = list()
         self.HEADER = 64
-    #  self.ADDR = (socket.gethostbyname(socket.gethostname()), 5050)
+        #self.ADDR = (socket.gethostbyname(socket.gethostname()), 5050)
         self.ADDR = ('192.168.1.107', 5050) #temp
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(self.ADDR)
 
-        # lidar stuff
-        self.lidar = RPLidar('/dev/ttyUSB0')
-        self.current_reading = np.empty((0, 0))
-
-        info = self.lidar.get_info()
-        print(info)
-
-        health = self.lidar.get_health()
-        print(health)
-
-    def read_lidar(self):
-        for scan in self.lidar.iter_scans():
-            self.current_reading = np.array(scan)
-            # np.save('temp.npy', np.array([self.current_reading]))
 
     def run(self):
         thread = threading.Thread(target = self.start)
         thread.start()
-        self.lidar_thread = threading.Thread(target = self.read_lidar)
-        self.lidar_thread.start()
  
     def start(self):
         self.server.listen()
@@ -62,10 +44,8 @@ class DroneServer:
 
     def stop(self):
         print('closing server')
-        self.lidar.stop()
-        self.lidar.disconnect()
         self.server.close()
-        self.lidar_thread.join()
+
 
     def handle_client(self, conn, addr):
         print(f"[NEW CONNECTION] {addr} connected.")
@@ -115,18 +95,31 @@ class DroneServer:
 
     def handle_map_client(self, conn):
         print("Sending map data.")
-        # conn.send("Map data:".encode('utf-8')) 
-        print(self.current_reading.shape)
-        temp = np.array(self.current_reading).tostring()
-        conn.send(temp)
-        pass
+
+        # get data
+        lidar_data = self.drone_map.get_lidar_data()
+        
+        # construct header message/transform numpy lidar readings to byte array
+        byte_lidar_data = pickle.dumps(lidar_data)
+        header = str(len(byte_lidar_data)).encode('utf-8')
+        print(f"drone lidar data: {byte_lidar_data}")
+        padded_header_msg = header + b' ' * (self.HEADER - len(header))
+
+        # send data
+        conn.send(padded_header_msg)
+        conn.send(byte_lidar_data)
 
     def handle_telemetry_client(self, conn):
         print("Sending telemetry data")
-        conn.send("Telemetry data:".encode('utf-8')) 
+        msg = "Telemetry data:"
+        header = str(len(msg)).encode('utf-8')
+        padded_header_msg = header + b' ' * (self.HEADER - len(header))
+        conn.send(padded_header_msg)
+        conn.send(msg.encode('utf-8')) 
         pass
 
     def handle_command_client(self, conn, msg):
         print(f"Command {msg} was receivied from the client") 
+        self.message_queue.put(msg)
         pass
 

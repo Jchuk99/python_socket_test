@@ -1,7 +1,11 @@
+import sys
+sys.path.append(".")
+from utils import LockedObject
 from time import sleep
 from threading import Thread
 import threading, queue
 import socket
+import pickle
 import numpy as np
 
 class DroneClients:
@@ -22,9 +26,10 @@ class DroneClients:
 
         # self.ADDR = (server, port number)
         self.HEADER = 64
-        PORT = 5050
-        SERVER = "10.0.0.101"
         self.ADDR = (server, port)
+        
+        #this np array is currently serving as thread-safe drone_map object
+        self.current_lidar_reading = LockedObject()
         self.current_lidar_reading = np.empty((1, 3))
 
     def start(self):
@@ -63,6 +68,7 @@ class DroneClients:
  
     def run_requests(self):
         for client in self.request_clients:
+            print(self.clients.get(client))
             thread = Thread(target = self.request_data, args=(client, self.clients.get(client)))
             thread.start()
         while True:
@@ -88,9 +94,14 @@ class DroneClients:
                 # dont have to send this everytime, think bout it later
                 self.send_message(client, str(len(msg)).encode('utf-8'), msg )
                 #depending on message either pickle a map or telemetry object
+                data_length = int(client.recv(self.HEADER).decode('utf-8').strip())
                 
                 if (msg == b'MAP'):
-                    arr = np.fromstring(client.recv(6000), dtype=float)
+
+                    #should be doing same thing
+                    arr = pickle.loads(client.recv(data_length))
+                    #arr = np.fromstring(client.recv(6000), dtype=float)
+
                     if arr.size % 3 == 0:
                         new = np.reshape(arr, (int(arr.size / 3), 3))
                         self.current_lidar_reading = new
@@ -99,8 +110,9 @@ class DroneClients:
                         #     if (i + 1 < arr.size):
                         #         self.current_lidar_reading[0].append(arr[i])
                         #         self.current_lidar_reading[1].append(arr[i + 1])
+                    print(f'map data: {arr}')
                 else:
-                    print(client.recv(2048).decode('utf-8'))
+                    print(client.recv(data_length).decode('utf-8'))
                 sleep(1)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")

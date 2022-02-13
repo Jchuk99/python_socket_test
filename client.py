@@ -11,6 +11,7 @@ def main():
 
     # map object, telemetry object, SERVER, PORT
     drone_clients = DroneClients(map, telemetry,"192.168.1.107", 5050 )
+    #drone_clients = DroneClients(map, telemetry,"10.0.0.101", 5050 )
     drone_clients.run()
     drone_clients.send_command("START")
     drone_clients.send_command("STOP")
@@ -18,7 +19,7 @@ def main():
     drone_clients.send_command("DISARM")
     while True:
         try:
-            print("clients are not blocking main thread")
+            #print("clients are not blocking main thread")
             sleep(1)
         except KeyboardInterrupt:
             print('interrupt')
@@ -27,9 +28,6 @@ def main():
 
     print('done')
     
-
-
-
 
 if __name__ == "__main__":
     main()
