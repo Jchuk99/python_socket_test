@@ -12,7 +12,7 @@ class DroneClients:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
     # communicate with drone
     # requires server to be running first
-# send first message to server
+    # send first message to server
     def send_message(self, client, header_msg, msg):
         padded_header_msg = header_msg + b' ' * (self.HEADER - len(header_msg))
         client.send(padded_header_msg)
@@ -105,12 +105,6 @@ class DroneClients:
                     if arr.size % 3 == 0:
                         new = np.reshape(arr, (int(arr.size / 3), 3))
                         self.current_lidar_reading = new
-                        # print()
-                        # for i in range(1, arr.size, 3):
-                        #     if (i + 1 < arr.size):
-                        #         self.current_lidar_reading[0].append(arr[i])
-                        #         self.current_lidar_reading[1].append(arr[i + 1])
-                    print(f'map data: {arr}')
                 else:
                     print(client.recv(data_length).decode('utf-8'))
                 sleep(1)
