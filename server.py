@@ -1,6 +1,7 @@
 import sys
 sys.path.append(".")
 from DroneServer import DroneServer
+from time import sleep
 
 
 def main():
@@ -11,6 +12,14 @@ def main():
     # will give map/telemetry data through map and telemetry data structures
     drone_server = DroneServer(map, telemetry, message_queue)
     drone_server.run()
+    while True:
+        try:
+            print("drone server is not blocking")
+            sleep(1)
+        except KeyboardInterrupt:
+            print('interrupt')
+            drone_server.stop()
+            break
 
 
 if __name__ == "__main__":

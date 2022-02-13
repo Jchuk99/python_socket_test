@@ -10,6 +10,8 @@ class DroneServer:
          self.env_map = env_map
          self.telemetry_data = telemetry_data
          self.message_queue = message_queue
+         self.lock = threading.Lock()
+         self.is_running = False
          # self.ADDR = (server, port number)
          self.clients = list()
          self.HEADER = 64
@@ -20,13 +22,7 @@ class DroneServer:
     def run(self):
         thread = threading.Thread(target = self.start)
         thread.start()
-        while True:
-            try:
-                sleep(1)
-            except KeyboardInterrupt:
-                self.stop()
-                break
-    
+ 
     def start(self):
         self.server.listen()
         print(f"[LISTENING] server is listening on {self.ADDR}")
@@ -43,6 +39,7 @@ class DroneServer:
                 break
 
     def stop(self):
+        print('closing server')
         self.server.close()
 
     def handle_client(self, conn, addr):

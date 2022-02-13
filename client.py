@@ -7,7 +7,7 @@ from time import sleep
 def main():
     map = 0  #get_map
     telemetry = 0 #get_telemetry
-    stop_threads = False
+
 
     # map object, telemetry object, SERVER, PORT
     drone_clients = DroneClients(map, telemetry,"10.0.0.101", 5050 )
@@ -18,6 +18,7 @@ def main():
     drone_clients.send_command("DISARM")
     while True:
         try:
+            print("clients are not blocking main thread")
             sleep(1)
         except KeyboardInterrupt:
             print('interrupt')
