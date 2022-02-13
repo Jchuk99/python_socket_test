@@ -1,27 +1,49 @@
+import sys
 from time import sleep
+import numpy as np
 import threading, queue
 import socket
+import subprocess
+from rplidar import RPLidar
 
 # this class is meant to be run in a seperate thread
 class DroneServer:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
     # communicate with drone
     def __init__(self, env_map, telemetry_data, message_queue):
-         self.env_map = env_map
-         self.telemetry_data = telemetry_data
-         self.message_queue = message_queue
-         self.lock = threading.Lock()
-         self.is_running = False
-         # self.ADDR = (server, port number)
-         self.clients = list()
-         self.HEADER = 64
-         self.ADDR = (socket.gethostbyname(socket.gethostname()), 5050)
-         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-         self.server.bind(self.ADDR)
+        self.env_map = env_map
+        self.telemetry_data = telemetry_data
+        self.message_queue = message_queue
+        self.lock = threading.Lock()
+        self.is_running = False
+        # self.ADDR = (server, port number)
+        self.clients = list()
+        self.HEADER = 64
+    #  self.ADDR = (socket.gethostbyname(socket.gethostname()), 5050)
+        self.ADDR = ('192.168.1.107', 5050) #temp
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind(self.ADDR)
+
+        # lidar stuff
+        self.lidar = RPLidar('/dev/ttyUSB0')
+        self.current_reading = np.empty((0, 0))
+
+        info = self.lidar.get_info()
+        print(info)
+
+        health = self.lidar.get_health()
+        print(health)
+
+    def read_lidar(self):
+        for scan in self.lidar.iter_scans():
+            self.current_reading = np.array(scan)
+            # np.save('temp.npy', np.array([self.current_reading]))
 
     def run(self):
         thread = threading.Thread(target = self.start)
         thread.start()
+        self.lidar_thread = threading.Thread(target = self.read_lidar)
+        self.lidar_thread.start()
  
     def start(self):
         self.server.listen()
@@ -40,7 +62,10 @@ class DroneServer:
 
     def stop(self):
         print('closing server')
+        self.lidar.stop()
+        self.lidar.disconnect()
         self.server.close()
+        self.lidar_thread.join()
 
     def handle_client(self, conn, addr):
         print(f"[NEW CONNECTION] {addr} connected.")
@@ -90,7 +115,10 @@ class DroneServer:
 
     def handle_map_client(self, conn):
         print("Sending map data.")
-        conn.send("Map data:".encode('utf-8')) 
+        # conn.send("Map data:".encode('utf-8')) 
+        print(self.current_reading.shape)
+        temp = np.array(self.current_reading).tostring()
+        conn.send(temp)
         pass
 
     def handle_telemetry_client(self, conn):
