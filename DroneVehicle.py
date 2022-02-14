@@ -42,7 +42,7 @@ class DroneVehicle:
 				break
 
 
-	def start(targetAlt):
+	def start(self, targetAlt):
 		
 		
 		self.running = True
