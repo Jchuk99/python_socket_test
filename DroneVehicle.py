@@ -68,7 +68,7 @@ class DroneVehicle:
 			print(" Waiting for arming...")
 			time.sleep(1)
 
-		print('vehicle.mode: {self.vehicle.mode}')
+		print(f'vehicle.mode: {self.vehicle.mode}')
 		print("Taking off!")
 		self.vehicle.simple_takeoff(targetAlt) # Take off to target altitude
 
