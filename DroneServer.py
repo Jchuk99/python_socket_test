@@ -1,50 +1,30 @@
 import sys
+sys.path.append(".")
+import utils
 from time import sleep
-import numpy as np
 import threading, queue
+import pickle
 import socket
-import subprocess
-from rplidar import RPLidar
-from FastestRplidar.source.fastestrplidar import FastestRplidar
 
 # this class is meant to be run in a seperate thread
 class DroneServer:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
     # communicate with drone
-    def __init__(self, env_map, telemetry_data, message_queue):
-        self.env_map = env_map
-        self.telemetry_data = telemetry_data
+    def __init__(self, drone_map, telemetry, message_queue, server, port):
+        # an already running drone map
+        self.drone_map = drone_map
+        self.telemetry = telemetry
         self.message_queue = message_queue
-        self.lock = threading.Lock()
-        self.is_running = False
-        # self.ADDR = (server, port number)
         self.clients = list()
-        self.HEADER = 64
-    #  self.ADDR = (socket.gethostbyname(socket.gethostname()), 5050)
-        self.ADDR = ('192.168.1.107', 5050) #temp
+  
+        self.ADDR = (server, port)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server.bind(self.ADDR)
 
-        # lidar stuff
-        self.lidar = FastestRplidar()
-        # connects the lidar using the default port (tty/USB0)
-        self.lidar.connectlidar()
-        # Starts the lidar motor
-        self.lidar.startmotor(my_scanmode=0)
-        
-        self.current_reading = np.empty((0, 0))
-
-    def read_lidar(self):
-        while True:
-            scan = self.lidar.get_scan_as_vectors(filter_quality=True)
-            self.current_reading = np.array(scan)
-            sleep(.1)
 
     def run(self):
         thread = threading.Thread(target = self.start)
         thread.start()
-        self.lidar_thread = threading.Thread(target = self.read_lidar)
-        self.lidar_thread.start()
  
     def start(self):
         self.server.listen()
@@ -63,9 +43,8 @@ class DroneServer:
 
     def stop(self):
         print('closing server')
-        self.lidar.stopmotor()
         self.server.close()
-        self.lidar_thread.join()
+
 
     def handle_client(self, conn, addr):
         print(f"[NEW CONNECTION] {addr} connected.")
@@ -75,7 +54,7 @@ class DroneServer:
 
         while connected:
             try:
-                msg = conn.recv(self.HEADER).decode('utf-8')
+                msg = conn.recv(utils.HEADER).decode('utf-8')
                 # blank message is sent the first time we connect, make sure we get actual message
                 if msg:
                     # strip padded part of buffer away
@@ -86,7 +65,6 @@ class DroneServer:
                     #first message will always contain client type
                     if not init:
                         client_type = self.get_client_type(msg)
-                        print(client_type)
                         init = True
                     else:
                         if client_type == 'TELEMETRY':
@@ -115,18 +93,38 @@ class DroneServer:
 
     def handle_map_client(self, conn):
         print("Sending map data.")
-        # conn.send("Map data:".encode('utf-8')) 
-        print(self.current_reading.shape)
-        temp = np.array(self.current_reading).tostring()
-        conn.send(temp)
-        pass
+
+        # get data
+        lidar_data = self.drone_map.get_lidar_data()
+        
+        # construct header message/transform numpy lidar readings to byte array
+        byte_lidar_data = pickle.dumps(lidar_data)
+        print(f"drone lidar data: {byte_lidar_data}")
+
+        header = str(len(byte_lidar_data)).encode('utf-8')
+        utils.send_message(conn, header, byte_lidar_data)
 
     def handle_telemetry_client(self, conn):
         print("Sending telemetry data")
-        conn.send("Telemetry data:".encode('utf-8')) 
+        msg = "Telemetry data:".encode('utf-8')
+
+        # get data
+        # telemetry = self.drone_telemetry
+
+        # construct header message/transform numpy lidar readings to byte array
+        # byte_telemetry_data = pickle.dumps(telemetry)
+        # print(f"telemetry data: {byte_telemetry_data}"))
+       
+        # header = str(len(byte_telemetry_data)).encode('utf-8')
+        # utils.send_message(conn, header, byte_telemetry_data)
+
+        header = str(len(msg)).encode('utf-8')
+        utils.send_message(conn, header, msg)
+
         pass
 
     def handle_command_client(self, conn, msg):
         print(f"Command {msg} was receivied from the client") 
+        self.message_queue.put(msg)
         pass
 

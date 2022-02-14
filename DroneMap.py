@@ -5,11 +5,18 @@ import subprocess
 import numpy as np
 import threading
 from rplidar import RPLidar
+from FastestRplidar.source.fastestrplidar import FastestRplidar
+
 
 class DroneMap:
     def __init__(self):
         # lidar stuff
-        self.lidar = RPLidar('/dev/ttyUSB0')
+        self.lidar = FastestRplidar()
+         # connects the lidar using the default port (tty/USB0)
+        self.lidar.connectlidar()
+         # Starts the lidar motor
+        self.lidar.startmotor(my_scanmode=0)
+
         self.current_reading = LockedObject()
         self.current_reading = np.empty((0, 0))
 
@@ -28,8 +35,10 @@ class DroneMap:
         # right now the lidar readings are using lockedObject class, which makes underlying
         # data collection thread-safe, will want to change that with the actual map object in the futre
         # unless we want to keep the possiblility of getting botht the map and the lidar readings.
-        for scan in self.lidar.iter_scans():
+         while True:
+            scan = self.lidar.get_scan_as_vectors(filter_quality=True)
             self.current_reading = np.array(scan)
+            sleep(.1)
         pass
 
     def run(self):
@@ -38,8 +47,7 @@ class DroneMap:
 
     def stop(self):
         print('stopping lidar')
-        self.lidar.stop()
-        self.lidar.disconnect()
+        self.lidar.stopmotor()
         self.lidar_thread.join()
 
     def get_lidar_data(self):
