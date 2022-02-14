@@ -28,7 +28,7 @@ class DroneVehicle:
 
 	def read(self):
 		while True:
-			telemetry = utils.Telemetry(
+			self.telemetry = utils.Telemetry(
 				self.vehicle.location.global_relative_frame.alt,
 				self.vehicle.attitude.pitch,
 				self.vehicle.attitude.yaw,
@@ -82,7 +82,7 @@ class DroneVehicle:
 				break
 			time.sleep(1)
 
-	def setV(Vx, Vy, Vz):
+	def setV(self, Vx, Vy, Vz):
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
 				0,
 				0,0,
