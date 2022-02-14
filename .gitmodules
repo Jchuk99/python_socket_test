@@ -1,0 +1,3 @@
+[submodule "FastestRplidar"]
+	path = FastestRplidar
+	url = https://github.com/thehapyone/FastestRplidar.git
