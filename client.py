@@ -13,9 +13,6 @@ def main():
    # drone_clients = DroneClients(map, telemetry,"10.0.0.101", 5050 )
     drone_clients.run()
     drone_clients.send_command("START")
-    drone_clients.send_command("STOP")
-    drone_clients.send_command("ARM")
-    drone_clients.send_command("DISARM")
     while True:
         try:
             #print("clients are not blocking main thread")
