@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import threading
 import copy
 HEADER = 64
@@ -12,6 +13,18 @@ def send_message(client, header_msg, msg):
         padded_header_msg = header_msg + b' ' * (HEADER - len(header_msg))
         client.send(padded_header_msg)
         client.send(msg)
+
+@dataclass
+class Telemetry:
+    altitude : float = 0.0
+    pitch : float = 0.0
+    yaw : float = 0.0
+    roll : float = 0.0
+    velocity : float = 0.0
+    airspeed : float = 0.0
+    groundspeed : float = 0.0
+    flight_mode : str = ""
+
 
 # haven't tested on non numpy objects
 class LockedObject(object):

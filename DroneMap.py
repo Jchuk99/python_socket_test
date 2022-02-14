@@ -35,7 +35,7 @@ class DroneMap:
         # right now the lidar readings are using lockedObject class, which makes underlying
         # data collection thread-safe, will want to change that with the actual map object in the futre
         # unless we want to keep the possiblility of getting botht the map and the lidar readings.
-         while True:
+        while True:
             scan = self.lidar.get_scan_as_vectors(filter_quality=True)
             self.current_reading = np.array(scan)
             sleep(.1)
