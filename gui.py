@@ -11,7 +11,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-from networking.DroneClients import DroneClients
+from libs.DroneClients import DroneClients
 
 class GroundStation:
 

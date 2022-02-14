@@ -84,11 +84,13 @@ class DroneClients:
             try:
                 # dont have to send this everytime, think bout it later
                 utils.send_message(client, str(len(msg)).encode('utf-8'), msg )
-                data_length = int(client.recv(utils.HEADER).decode('utf-8').strip())
-                
-                if (msg == b'MAP'):
-                    arr = pickle.loads(client.recv(data_length))
+                # data_length = int(client.recv(utils.HEADER).decode('utf-8').strip())
+                # print(str(msg.decode('utf-8')), 'len:', data_length)
 
+                if (msg == b'MAP'):
+                    # arr = pickle.loads(client.recv(data_length))
+                    payload = client.recv(8192)
+                    arr = np.fromstring(payload, dtype=float)
                     if arr.size % 3 == 0:
                         new = np.reshape(arr, (int(arr.size / 3), 3))
                         self.current_lidar_reading = new
