@@ -1,4 +1,7 @@
 from dronekit import VehicleMode, connect, LocationGlobalRelative
+import sys
+sys.path.append(".")
+import utils
 from pymavlink import mavutil
 import threading
 import time
