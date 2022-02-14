@@ -20,11 +20,11 @@ class DroneMap:
         self.current_reading = LockedObject()
         self.current_reading = np.empty((0, 0))
 
-        info = self.lidar.get_info()
-        print(info)
+        #info = self.lidar.get_info()
+        #print(info)
 
-        health = self.lidar.get_health()
-        print(health)
+        #health = self.lidar.get_health()
+        #print(health)
 
         # ultrasonic stuff?
 
