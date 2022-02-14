@@ -29,8 +29,8 @@ class DroneVehicle:
 			telemetry = utils.Telemetry(
 				self.vehicle.location.global_relative_frame.alt,
 				self.vehicle.attitude.pitch,
-				self.vehicle.attiude.yaw,
-				self.vehicle.attiude.roll,
+				self.vehicle.attitude.yaw,
+				self.vehicle.attitude.roll,
 				self.vehicle.velocity,
 				self.vehicle.airspeed,
 				self.vehicle.groundspeed,
@@ -52,7 +52,7 @@ class DroneVehicle:
 
 		print("Basic pre-arm checks")
 		# Don't try to arm until autopilot is ready
-		while not vehicle.is_armable:
+		while not self.vehicle.is_armable:
 			print(" Waiting for vehicle to initialise...")
 			time.sleep(1)
 
