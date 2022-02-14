@@ -106,25 +106,21 @@ class DroneServer:
 
     def handle_telemetry_client(self, conn):
         print("Sending telemetry data")
-        msg = "Telemetry data:".encode('utf-8')
+
 
         # get data
-        # telemetry = self.drone_telemetry
+        telemetry = self.drone_telemetry
 
         # construct header message/transform numpy lidar readings to byte array
-        # byte_telemetry_data = pickle.dumps(telemetry)
-        # print(f"telemetry data: {byte_telemetry_data}"))
+        byte_telemetry_data = pickle.dumps(telemetry)
+        print(f"telemetry data: {byte_telemetry_data}"))
        
-        # header = str(len(byte_telemetry_data)).encode('utf-8')
-        # utils.send_message(conn, header, byte_telemetry_data)
+        header = str(len(byte_telemetry_data)).encode('utf-8')
+        utils.send_message(conn, header, byte_telemetry_data)
 
-        header = str(len(msg)).encode('utf-8')
-        utils.send_message(conn, header, msg)
-
-        pass
 
     def handle_command_client(self, conn, msg):
         print(f"Command {msg} was receivied from the client") 
         self.message_queue.put(msg)
-        pass
+  
 

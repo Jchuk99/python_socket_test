@@ -92,8 +92,10 @@ class DroneClients:
                     if arr.size % 3 == 0:
                         new = np.reshape(arr, (int(arr.size / 3), 3))
                         self.current_lidar_reading = new
-                # else:
-                #     print(client.recv(2048).decode('utf-8'))
+                else:
+                    telemetry = pickle.loads(client.recv(data_length))
+                    print(telemetry)
+ 
                 sleep(.1)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")
