@@ -39,7 +39,7 @@ class DroneVehicle:
 				self.vehicle.mode.name
 			)
 
-			sleep(1)
+			sleep(2)
 			if not self.running:
 				break
 
