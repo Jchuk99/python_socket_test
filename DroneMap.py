@@ -5,6 +5,7 @@ import subprocess
 import numpy as np
 import threading
 from rplidar import RPLidar
+
 class DroneMap:
     def __init__(self):
         # lidar stuff

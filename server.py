@@ -8,12 +8,15 @@ from time import sleep
 
 def main():
     drone_map = DroneMap()  # thread-safe map object
-    telemetry = 0 #get mutable/thread-safe telemetry object
+    # telemetry = DroneTelemetry() #get mutable/thread-safe telemetry object
+    telemetry = 0
     message_queue = Queue()  # thread-safe message queue class 
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
 
-    drone_server = DroneServer(drone_map, telemetry, message_queue)
+    drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
+   # drone_server = DroneServer(drone_map, telemetry, message_queue, ,"10.0.0.101", 5050)
+
     drone_map.run()
     drone_server.run()
     while True:
@@ -21,7 +24,9 @@ def main():
             message = message_queue.get()
             if message == 'START':
                 # AKA we start a new thread to get the drone to hover, and run obstacle avoidance
-                # give this thread the drone_map to run obstacle avoidance, also need a to give it
+                # give this thread: 
+                # drone_map to run obstacle avoidance using provided info,
+                # drone_telemetry
                 # a shutdown signal that we can use to stop whenever the stop command starts
                 print('drone is starting')
             elif message == 'STOP':

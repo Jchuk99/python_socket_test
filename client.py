@@ -8,10 +8,9 @@ def main():
     map = 0  #get_map
     telemetry = 0 #get_telemetry
 
-
     # map object, telemetry object, SERVER, PORT
     drone_clients = DroneClients(map, telemetry,"192.168.1.107", 5050 )
-    #drone_clients = DroneClients(map, telemetry,"10.0.0.101", 5050 )
+   # drone_clients = DroneClients(map, telemetry,"10.0.0.101", 5050 )
     drone_clients.run()
     drone_clients.send_command("START")
     drone_clients.send_command("STOP")
