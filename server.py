@@ -1,5 +1,6 @@
 import sys
 sys.path.append(".")
+import utils
 from DroneServer import DroneServer
 from DroneMap import DroneMap
 from queue import Queue
@@ -8,12 +9,11 @@ from time import sleep
 
 def main():
     telemetry = utils.LockedObject()
-    telemetry = Telemetry()
+    telemetry = utils.Telemetry() #thread-safe telemetry oject
 
     drone_map = DroneMap()  # thread-safe map object
-    # telemetry = DroneVehicle() #get mutable/thread-safe telemetry object
-    telemetry = 0
     message_queue = Queue()  # thread-safe message queue class 
+
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
 
