@@ -5,7 +5,8 @@ import utils
 from pymavlink import mavutil
 import threading
 import time
-import sleep
+from time import sleep
+
 import socket
 import argparse
 
