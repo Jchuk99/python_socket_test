@@ -27,14 +27,14 @@ class DroneVehicle:
 	def read(self):
 		while True:
 			telemetry = utils.Telemetry(
-				vehicle.location.global_relative_frame.alt,
-				vehicle.attitude.pitch,
-				vehicle.attiude.yaw,
-				vehicle.attiude.roll,
-				vehicle.velocity,
-				vehicle.airspeed,
-				vehicle.groundspeed,
-				vehicle.mode.name
+				self.vehicle.location.global_relative_frame.alt,
+				self.vehicle.attitude.pitch,
+				self.vehicle.attiude.yaw,
+				self.vehicle.attiude.roll,
+				self.vehicle.velocity,
+				self.vehicle.airspeed,
+				self.vehicle.groundspeed,
+				self.vehicle.mode.name
 			)
 
 			sleep(1)
