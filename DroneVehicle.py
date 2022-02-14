@@ -21,14 +21,15 @@ class DroneVehicle:
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
 		self.isRunning = utils.LockedObject()
 		self.isRunning = False
-		self.telemetry = telemetry_data
+		self.telemetry = utils.LockedObject()
+		self.telemetry = utils.Telemetry()
 		print(self.addr)
 		self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
 	def read(self):
 		while True:
-			telemetry = utils.Telemetry(
+			self.telemetry = utils.Telemetry(
 				self.vehicle.location.global_relative_frame.alt,
 				self.vehicle.attitude.pitch,
 				self.vehicle.attitude.yaw,
@@ -82,7 +83,7 @@ class DroneVehicle:
 				break
 			time.sleep(1)
 
-	def setV(Vx, Vy, Vz):
+	def setV(self, Vx, Vy, Vz):
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
 				0,
 				0,0,

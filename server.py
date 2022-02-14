@@ -9,8 +9,6 @@ from time import sleep
 
 
 def main():
-    telemetry = utils.LockedObject()
-    telemetry = utils.Telemetry() #thread-safe telemetry oject
 
     drone_map = DroneMap()  # thread-safe map object
     message_queue = Queue()  # thread-safe message queue class 
@@ -18,12 +16,11 @@ def main():
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
 
+    drone_vehicle = DroneVehicle('127.0.0.1', 5760)
     #drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
    # drone_server = DroneServer(drone_map, telemetry, message_queue, ,"10.0.0.101", 5050)
-    drone_server = DroneServer(drone_map, telemetry, message_queue, "10.0.0.39", 5050)
-
-    drone_vehicle = DroneVehicle(telemetry, '127.0.0.1', 5760)
-
+    drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
+    
     drone_map.run()
     drone_server.run()
     while True:

@@ -10,10 +10,10 @@ import socket
 class DroneServer:
     # needs to have a thread-safe map, thread-safe telemetry data, and a message_queue to
     # communicate with drone
-    def __init__(self, drone_map, telemetry, message_queue, server, port):
+    def __init__(self, drone_map, drone_vehicle, message_queue, server, port):
         # an already running drone map
         self.drone_map = drone_map
-        self.telemetry = telemetry
+        self.drone_vehicle = drone_vehicle
         self.message_queue = message_queue
         self.clients = list()
   
@@ -108,7 +108,7 @@ class DroneServer:
         #print("Sending telemetry data")
 
         # get data
-        telemetry = self.telemetry
+        telemetry = self.drone_vehicle.telemetry
 
         # construct header message/transform numpy lidar readings to byte array
         byte_telemetry_data = pickle.dumps(telemetry)
