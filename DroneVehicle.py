@@ -64,7 +64,7 @@ class DroneVehicle:
 		self.vehicle.armed   = True
 
 		# Confirm vehicle armed before attempting to take off
-		while not vehicle.armed:
+		while not self.vehicle.armed:
 			print(" Waiting for arming...")
 			time.sleep(1)
 
