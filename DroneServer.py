@@ -5,6 +5,7 @@ import threading, queue
 import socket
 import subprocess
 from rplidar import RPLidar
+from FastestRplidar.source.fastestrplidar import FastestRplidar
 
 # this class is meant to be run in a seperate thread
 class DroneServer:
@@ -25,19 +26,19 @@ class DroneServer:
         self.server.bind(self.ADDR)
 
         # lidar stuff
-        self.lidar = RPLidar('/dev/ttyUSB0')
+        self.lidar = FastestRplidar()
+        # connects the lidar using the default port (tty/USB0)
+        self.lidar.connectlidar()
+        # Starts the lidar motor
+        self.lidar.startmotor(my_scanmode=0)
+        
         self.current_reading = np.empty((0, 0))
 
-        info = self.lidar.get_info()
-        print(info)
-
-        health = self.lidar.get_health()
-        print(health)
-
     def read_lidar(self):
-        for scan in self.lidar.iter_scans():
+        while True:
+            scan = self.lidar.get_scan_as_vectors(filter_quality=True)
             self.current_reading = np.array(scan)
-            # np.save('temp.npy', np.array([self.current_reading]))
+            sleep(.1)
 
     def run(self):
         thread = threading.Thread(target = self.start)
@@ -62,8 +63,7 @@ class DroneServer:
 
     def stop(self):
         print('closing server')
-        self.lidar.stop()
-        self.lidar.disconnect()
+        self.lidar.stopmotor()
         self.server.close()
         self.lidar_thread.join()
 
