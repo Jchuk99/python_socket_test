@@ -19,7 +19,7 @@ def main():
 
     #drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
    # drone_server = DroneServer(drone_map, telemetry, message_queue, ,"10.0.0.101", 5050)
-    drone_server = DroneServer(drone_map, telemetry, message_queue, ,"10.0.0.39", 5050)
+    drone_server = DroneServer(drone_map, telemetry, message_queue, "10.0.0.39", 5050)
 
     drone_vehicle = DroneVehicle(telemetry, '127.0.0.1:5760', 5760)
 
