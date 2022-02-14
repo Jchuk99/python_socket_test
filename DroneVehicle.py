@@ -14,7 +14,7 @@ import argparse
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, telemetry_data, server, port):
+	def __init__(self, server, port):
 		self.addr = f'tcp:{server}:{port}'
 		#'tcp:127.0.0.1:5760'
 		#connect to flight controller
