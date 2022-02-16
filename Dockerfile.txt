@@ -15,3 +15,9 @@ alias python=python3.8
 cd ~
 apt-get -y install pip
 git clone https://github.com/Jchuk99/python_socket_test.git
+
+venv setup
+pip3.8 install --user wheel
+pip3.8 install pymavlink==2.4.8
+pip3.8 install dronekit
+pip3.8 install numpy
