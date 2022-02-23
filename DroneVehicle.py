@@ -25,7 +25,7 @@ class DroneVehicle:
 		self.telemetry = utils.Telemetry()
 		print(self.addr)
 		self.vehicle = connect('udp:127.0.0.1:14551', wait_ready=True)
-		self.vehicle = connect(self.addr, wait_ready=True)
+		#self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
 	def read(self):
