@@ -24,6 +24,12 @@
 
 
 
+C:\Users\Udoka\.pyenv\pyenv-win\versions\3.8.10\include
+C:\Users\Udoka\.pyenv\pyenv-win\versions\3.8.10\libs
+python38.dll - 
+KERNEL32.dll - on sys path
+	
+
 # DOCKER DIRECTIONS
 1. Install Docker Desktop
     if most up to date version doesn't recognize WSL 2 on desktop, install v3.5.2
