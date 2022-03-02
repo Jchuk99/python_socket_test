@@ -11,11 +11,11 @@ from rplidar import RPLidar
 class DroneMap:
     def __init__(self):
         # lidar stuff
-        #self.lidar = FastestRplidar()
+        self.lidar = PyLidar("COM5", 115200)
          # connects the lidar using the default port (tty/USB0)
-        #self.lidar.connectlidar()
+        self.lidar.connect()
          # Starts the lidar motor
-        #self.lidar.startmotor(my_scanmode=0)
+        self.lidar.start_motor()
 
         self.current_reading = LockedObject()
         self.current_reading = np.empty((0, 0))
@@ -35,10 +35,9 @@ class DroneMap:
         # right now the lidar readings are using lockedObject class, which makes underlying
         # data collection thread-safe, will want to change that with the actual map object in the futre
         # unless we want to keep the possiblility of getting botht the map and the lidar readings.
-        # while True:
-        #     scan = self.lidar.get_scan_as_vectors(filter_quality=True)
-        #     self.current_reading = np.array(scan)
-        #     sleep(.1)
+        while True:
+                self.current_reading = self.lidar.get_scan_as_np(True)
+                sleep(.1)
         pass
 
     def run(self):
