@@ -1,22 +1,28 @@
 import sys
 sys.path.append(".")
+from PyLidar import PyLidar
 from utils import LockedObject
 import subprocess
 import numpy as np
 import threading
-from rplidar import RPLidar
-#from FastestRplidar.source.fastestrplidar import FastestRplidar
+from time import sleep
+import time
+
 
 
 class DroneMap:
     def __init__(self):
         # lidar stuff
-        self.lidar = PyLidar("COM5", 115200)
-         # connects the lidar using the default port (tty/USB0)
-        self.lidar.connect()
-         # Starts the lidar motor
-        self.lidar.start_motor()
-
+        try:
+            self.lidar = PyLidar("COM5", 115200)
+            # connects the lidar using the default port (tty/USB0)
+            self.lidar.connect()
+            # Starts the lidar motor
+            self.lidar.start_motor()
+        except OSError:
+            print("Lidar is not properly connected.")
+            sys.exit()
+        
         self.current_reading = LockedObject()
         self.current_reading = np.empty((0, 0))
 
@@ -36,8 +42,13 @@ class DroneMap:
         # data collection thread-safe, will want to change that with the actual map object in the futre
         # unless we want to keep the possiblility of getting botht the map and the lidar readings.
         while True:
-                self.current_reading = self.lidar.get_scan_as_np(True)
-                sleep(.1)
+                start = time.time()
+                self.current_reading = self.lidar.get_lidar_scans_as_np(True)
+                end = time.time()
+                #print("Elapsed time: {}".format(end - start))
+                #print("Frequency (Hz): {}".format(1/(end-start)))
+                print(np.array_str(self.current_reading))
+                sleep(5)
         pass
 
     def run(self):
