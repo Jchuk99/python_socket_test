@@ -3,6 +3,7 @@ import numpy as np
 import time
 lib = cdll.LoadLibrary(r'C:\Users\Udoka\Desktop\Projects\rplidar_sdk\workspaces\vc14\x64\Release\sdk_test.dll')
 
+#TODO: mem leaks present because pointers aren't being freed
 class LidarScan(Structure):
     _fields_ = [("data", POINTER(POINTER(c_double))),
                 ("size", c_int)]
@@ -44,6 +45,9 @@ class PyLidar(object):
         with np.nditer(data, flags=['multi_index'], op_flags=['readwrite']) as it:
             for x in it:
                 x[...] = lidar_scans.data[it.multi_index[0]][it.multi_index[1]]
+        # find way to free data
+        # or self.free(lidar_scans)
+        #lib.free(c_void_p(lidar_scans))
         return data
 
 
