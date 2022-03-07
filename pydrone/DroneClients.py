@@ -84,6 +84,10 @@ class DroneClients:
             self.lock.release()
         return is_running
 
+    def get_lidar_scan(self):
+        #print(np.array_str(self.current_lidar_reading))
+        return self.map_client.current_lidar_reading
+   
     # will be called on GUI event
     def send_command(self, msg):
         self.command_client.send_command(msg)

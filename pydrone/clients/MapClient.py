@@ -55,8 +55,8 @@ class MapClient:
                 if  arr.size % 3 == 0:
                     new = np.reshape(arr, (int(arr.size / 3), 3))
                     self.current_lidar_reading = new
-                print("Map data: " + np.array_str(self.current_lidar_reading))
-                sleep(.1)
+                #print("Map data: " + np.array_str(self.current_lidar_reading))
+                sleep(.05)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")
                 break

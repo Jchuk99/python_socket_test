@@ -47,8 +47,8 @@ class DroneMap:
                 end = time.time()
                 #print("Elapsed time: {}".format(end - start))
                 #print("Frequency (Hz): {}".format(1/(end-start)))
-                print(np.array_str(self.current_reading))
-                sleep(5)
+                #print(np.array_str(self.current_reading))
+                sleep(.1)
         pass
 
     def run(self):
