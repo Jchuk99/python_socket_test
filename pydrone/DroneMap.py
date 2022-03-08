@@ -67,12 +67,11 @@ class DroneMap:
             self.current_reading = items
              # Extract distances and angles from triples
             distances = items[:,2].tolist()
-            print(distances)
+            print(len(distances)
             angles    = items[:,1].tolist()
-            print(angles)
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
-                self.slam.update(distances, scan_angles_degrees=angles)
+                self.slam.update(distances)
                 previous_distances = distances.copy()
                 previous_angles    = angles.copy()
                 # If not adequate, use previous
