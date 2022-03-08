@@ -88,6 +88,13 @@ class DroneMap:
                 newshape=(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
             )
             print(str(self.map))
+            print(
+                "X: {} Y: {} THETA: {}\n".format(
+                    x,
+                    y,
+                    theta
+                )
+            )
             sleep(.1)
         pass
 
