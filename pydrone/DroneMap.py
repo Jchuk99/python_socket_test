@@ -70,17 +70,17 @@ class DroneMap:
             angles    = items[:,1].tolist()
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
-                slam.update(distances, scan_angles_degrees=angles)
+                self.slam.update(distances, scan_angles_degrees=angles)
                 previous_distances = distances.copy()
                 previous_angles    = angles.copy()
                 # If not adequate, use previous
             elif previous_distances is not None:
-                slam.update(previous_distances, scan_angles_degrees=previous_angles)
+                self.slam.update(previous_distances, scan_angles_degrees=previous_angles)
                  # Get current robot position
-            x, y, theta = slam.getpos()
+            x, y, theta = self.slam.getpos()
 
             # Get current map bytes as grayscale
-            slam.getmap(mapbytes)
+            self.slam.getmap(mapbytes)
             self.map = np.reshape(
                 np.frombuffer(mapbytes, dtype=np.int8),
                 newshape=(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
