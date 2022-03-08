@@ -25,7 +25,7 @@ class GroundStation:
 
         self.app = QApplication([])
         self.window = Window()
-        self.drone_clients = DroneClients("10.0.0.101", 5050)
+        self.drone_clients = DroneClients("10.0.0.118", 5050)
         # self.lidar = PyLidar("COM5", 115200)
         # # connects the lidar using the default port (tty/USB0)
         # self.lidar.connect()

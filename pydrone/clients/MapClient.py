@@ -50,7 +50,13 @@ class MapClient:
                 )
 
                 data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
-                arr = pickle.loads(self.client.recv(data_length))
+                print(data_length)
+                data = b""
+                while len(data) < data_length:
+                    packet = self.client.recv(4096)
+                    if not packet: break
+                    data += packet
+                arr = pickle.loads(data)
 
                 if  arr.size % 3 == 0:
                     new = np.reshape(arr, (int(arr.size / 3), 3))
