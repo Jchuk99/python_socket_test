@@ -16,4 +16,4 @@ RUN $ echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
 export PATH="$PYENV_ROOT/shims:$PATH"
 RUN git clone https://github.com/Jchuk99/python_socket_test.git
 RUN pyenv install 3.8.10
-/home/pi/python_socket_test/pydrone/libs/Linux/ARM64
+RUN export LD_LIBRARY_PATH="/home/pi/python_socket_test/pydrone/libs/Linux/ARM64"

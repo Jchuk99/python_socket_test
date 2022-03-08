@@ -13,6 +13,7 @@ import matplotlib.animation as animation
 
 sys.path.append(r"../pydrone")
 sys.path.append(r"../pydrone/clients")
+from PyLidar import PyLidar
 from DroneClients import DroneClients
 
 class GroundStation:
@@ -25,6 +26,11 @@ class GroundStation:
         self.app = QApplication([])
         self.window = Window()
         self.drone_clients = DroneClients("10.0.0.101", 5050)
+        # self.lidar = PyLidar("COM5", 115200)
+        # # connects the lidar using the default port (tty/USB0)
+        # self.lidar.connect()
+        # # Starts the lidar motor
+        # self.lidar.start_motor()
         self.connected = False
 
         self.form = Form()
@@ -33,7 +39,7 @@ class GroundStation:
         self.canvas = FigureCanvas(plt.Figure())
         self.form.lidarGraph.addWidget(self.canvas)
         self.ax = self.canvas.figure.add_subplot(projection='polar')
-        self.ax.set_rmax(4000)
+        self.ax.set_rmax(8000)
         self.ax.grid(True)
 
         self.form.connectButton.clicked.connect(self.connectDrone)
@@ -47,10 +53,11 @@ class GroundStation:
     def update_lidar_render(self):
         while self.connected:
             arr = self.drone_clients.get_lidar_scan()
+            #arr = self.lidar.get_lidar_scans_as_np(True)
             self.ax.clear()
            # print(arr)
             theta = np.radians(arr[:, 1])
-            self.ax.scatter(theta, arr[:, 0], s = 1)
+            self.ax.scatter(theta, arr[:, 2], s = 1)
             self.canvas.draw()
             sleep(.1)
 
