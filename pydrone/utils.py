@@ -12,7 +12,8 @@ HEADER = 64
 def send_message(client, header_msg, msg):
         padded_header_msg = header_msg + b' ' * (HEADER - len(header_msg))
         client.send(padded_header_msg)
-        client.send(msg)
+        print(header_msg)
+        print(client.send(msg))
 
 @dataclass
 class Telemetry:
