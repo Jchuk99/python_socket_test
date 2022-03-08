@@ -54,7 +54,7 @@ class DroneMap:
     def read(self):
         #TODO: this is  where the SLAM algorithm should go 
     
-        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS)
+        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS, hole_width_mm=1000)
 
         # We will use these to store previous scan in case current scan is inadequate
         previous_distances = None
@@ -67,11 +67,12 @@ class DroneMap:
             self.current_reading = items
              # Extract distances and angles from triples
             distances = items[:,2].tolist()
-            print(len(distances)
-            angles    = items[:,1].tolist()
+            print(distances[0])
+            angles = items[:,1].tolist()
+            print(angles[0])
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
-                self.slam.update(distances)
+                self.slam.update(distances, scan_angles_degrees=angles)
                 previous_distances = distances.copy()
                 previous_angles    = angles.copy()
                 # If not adequate, use previous
