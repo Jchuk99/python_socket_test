@@ -87,6 +87,9 @@ class DroneClients:
     def get_lidar_scan(self):
         #print(np.array_str(self.current_lidar_reading))
         return self.map_client.current_lidar_reading
+    
+    def get_position_map(self):
+        return self.map_client.position_map
    
     # will be called on GUI event
     def send_command(self, msg):

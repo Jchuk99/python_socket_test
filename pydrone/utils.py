@@ -25,6 +25,13 @@ class Telemetry:
     groundspeed : float = 0.0
     flight_mode : str = ""
 
+@dataclass
+class PositionMap:
+    mapbytes : bytearray = bytearray()
+    x : float = 0.0
+    y : float = 0.0
+    theta : float = 0.0
+
 
 # haven't tested on non numpy objects
 class LockedObject(object):

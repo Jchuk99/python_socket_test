@@ -41,7 +41,7 @@ class DroneMap:
         self.current_reading = np.empty((0, 0))
 
         self.map = LockedObject()
-        self.map = np.empty((0, 0))
+        self.map = utils.PositionMap()
 
         #info = self.lidar.get_info()
         #print(info)
@@ -83,17 +83,8 @@ class DroneMap:
 
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
-            self.map = np.reshape(
-                np.frombuffer(mapbytes, dtype=np.int8),
-                newshape=(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
-            )
-            print(str(self.map))
-            print(
-                "X: {} Y: {} THETA: {}\n".format(
-                    x,
-                    y,
-                    theta
-                )
+            self.map = utils.PositionMap(
+                mapbytes,x,y,theta
             )
             sleep(.1)
         pass
@@ -113,7 +104,7 @@ class DroneMap:
          data = self.current_reading
          return data
     
-    def get_map(self):
+    def get_map_data(self):
          data = self.map
          return data
          

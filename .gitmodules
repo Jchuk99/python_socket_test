@@ -4,3 +4,6 @@
 [submodule "pydrone/BreezySLAM"]
 	path = pydrone/BreezySLAM
 	url = https://github.com/simondlevy/BreezySLAM.git
+[submodule "pydrone/PyRoboViz"]
+	path = pydrone/PyRoboViz
+	url = https://github.com/simondlevy/PyRoboViz.git
