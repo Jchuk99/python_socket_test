@@ -1,5 +1,5 @@
-MAP_SIZE_PIXELS         = 500
-MAP_SIZE_METERS         = 10
+MAP_SIZE_PIXELS         = 100
+MAP_SIZE_METERS         = 3
 LIDAR_DEVICE            = '/dev/ttyUSB0'
 
 # Ideally we could use all 250 or so samples that the RPLidar delivers in one 
@@ -9,6 +9,8 @@ MIN_SAMPLES   = 200
 
 from breezyslam.algorithms import RMHC_SLAM
 from breezyslam.sensors import RPLidarA1 as LaserModel
+from scipy.interpolate import interp1d
+
 
 import sys
 sys.path.append(".")
@@ -27,8 +29,6 @@ class DroneMap:
         # lidar stuff
         try:
             self.lidar = PyLidar(LIDAR_DEVICE, 115200)
-            # Create an RMHC SLAM object with a laser model and optional robot model
-            self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS)
             # connects the lidar using the default port (tty/USB0)
             self.lidar.connect()
             # Starts the lidar motor
@@ -54,7 +54,7 @@ class DroneMap:
     def read(self):
         #TODO: this is  where the SLAM algorithm should go 
     
-        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS, hole_width_mm=1000)
+        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS, hole_width_mm=2000)
 
         # We will use these to store previous scan in case current scan is inadequate
         previous_distances = None
@@ -67,17 +67,18 @@ class DroneMap:
             self.current_reading = items
              # Extract distances and angles from triples
             distances = items[:,2].tolist()
-            print(distances[0])
             angles = items[:,1].tolist()
-            print(angles[0])
+            print(len(distances))
+            f = interp1d(angles, distances, fill_value='extrapolate')
+            distances = list(f(np.arange(360)))
+            print(distances)
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
-                self.slam.update(distances, scan_angles_degrees=angles)
+                self.slam.update(distances)
                 previous_distances = distances.copy()
-                previous_angles    = angles.copy()
                 # If not adequate, use previous
             elif previous_distances is not None:
-                self.slam.update(previous_distances, scan_angles_degrees=previous_angles)
+                self.slam.update(previous_distances)
                  # Get current robot position
             x, y, theta = self.slam.getpos()
 
