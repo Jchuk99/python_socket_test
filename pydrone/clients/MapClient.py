@@ -21,12 +21,8 @@ class MapClient:
             self.socket_map[protocol.upper()]
         )
 
-        #this np array is currently serving as thread-safe drone_map object
-        self.current_lidar_reading = utils.LockedObject()
-        self.current_lidar_reading = np.empty((1, 3))
-
-        self.position_map = utils.LockedObject()
-        self.position_map = utils.PositionMap()
+        self.map = utils.LockedObject()
+        self.map = utils.MapData()
 
     def connect(self):
         self.client.connect(self.ADDR)
@@ -62,21 +58,8 @@ class MapClient:
                     packet = self.client.recv(4096)
                     if not packet: break
                     data += packet
-                arr = pickle.loads(data)
-                print(arr)
-                #get map data
-                data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
-                print(data_length)
-                data = b''
-                while len(data) < data_length:
-                    packet = self.client.recv(4096)
-                    if not packet: break
-                    data += packet
-                self.position_map = pickle.loads(data)
-
-                if  arr.size % 3 == 0:
-                    new = np.reshape(arr, (int(arr.size / 3), 3))
-                    self.current_lidar_reading = new
+                self.map = pickle.loads(data)
+                print(self.map)
                 sleep(.05)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")

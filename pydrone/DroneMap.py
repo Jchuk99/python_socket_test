@@ -1,5 +1,5 @@
-MAP_SIZE_PIXELS         = 100
-MAP_SIZE_METERS         = 3
+MAP_SIZE_PIXELS         = 500
+MAP_SIZE_METERS         = 10
 LIDAR_DEVICE            = '/dev/ttyUSB0'
 
 # Ideally we could use all 250 or so samples that the RPLidar delivers in one 
@@ -37,12 +37,9 @@ class DroneMap:
         except OSError:
             print("Lidar is not properly connected.")
             sys.exit()
-        
-        self.current_reading = LockedObject()
-        self.current_reading = np.empty((0, 0))
 
         self.map = LockedObject()
-        self.map = PositionMap()
+        self.map = MapData()
 
         #info = self.lidar.get_info()
         #print(info)
@@ -65,7 +62,6 @@ class DroneMap:
         mapbytes = bytearray(MAP_SIZE_PIXELS * MAP_SIZE_PIXELS)
         while True:
             items = self.lidar.get_lidar_scans_as_np(True)
-            self.current_reading = items
              # Extract distances and angles from triples
             distances = items[:,2].tolist()
             angles = items[:,1].tolist()
@@ -86,7 +82,7 @@ class DroneMap:
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
             self.map = utils.PositionMap(
-                mapbytes,x,y,theta
+                items,mapbytes,x,y,theta
             )
             sleep(.1)
         pass
@@ -101,11 +97,6 @@ class DroneMap:
         self.lidar.disconnect()
         self.lidar_thread.join()
 
-    def get_lidar_data(self):
-         print(self.current_reading.shape)
-         data = self.current_reading
-         return data
-    
     def get_map_data(self):
          data = self.map
          return data

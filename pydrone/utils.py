@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import numpy as np
 import threading
 import copy
 HEADER = 64
@@ -27,6 +28,7 @@ class Telemetry:
 
 @dataclass
 class PositionMap:
+    lidar_data : np.ndarray = np.empty((1, 3))
     mapbytes : bytearray = bytearray()
     x : float = 0.0
     y : float = 0.0
