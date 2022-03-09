@@ -16,6 +16,7 @@ import sys
 sys.path.append(".")
 from PyLidar import PyLidar
 from utils import LockedObject
+from utils import PositionMap
 import subprocess
 import numpy as np
 import threading
@@ -41,7 +42,7 @@ class DroneMap:
         self.current_reading = np.empty((0, 0))
 
         self.map = LockedObject()
-        self.map = utils.PositionMap()
+        self.map = PositionMap()
 
         #info = self.lidar.get_info()
         #print(info)

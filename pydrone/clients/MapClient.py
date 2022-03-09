@@ -63,7 +63,7 @@ class MapClient:
                     if not packet: break
                     data += packet
                 arr = pickle.loads(data)
-
+                print(arr)
                 #get map data
                 data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
                 print(data_length)
