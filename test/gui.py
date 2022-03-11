@@ -52,8 +52,8 @@ class GroundStation:
     
     def update_lidar_render(self):
         while self.connected:
-            arr = self.drone_clients.get_lidar_scan()
-            #arr = self.lidar.get_lidar_scans_as_np(True)
+            #arr = self.drone_clients.get_map()
+            arr = self.lidar.get_lidar_scans_as_np(True)
             self.ax.clear()
            # print(arr)
             theta = np.radians(arr[:, 1])

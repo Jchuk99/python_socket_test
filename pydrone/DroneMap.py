@@ -16,7 +16,7 @@ import sys
 sys.path.append(".")
 from PyLidar import PyLidar
 from utils import LockedObject
-from utils import PositionMap
+from utils import MapData
 import subprocess
 import numpy as np
 import threading

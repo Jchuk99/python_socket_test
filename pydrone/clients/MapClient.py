@@ -59,7 +59,6 @@ class MapClient:
                     if not packet: break
                     data += packet
                 self.map = pickle.loads(data)
-                print(self.map)
                 sleep(.05)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")

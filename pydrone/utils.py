@@ -27,7 +27,7 @@ class Telemetry:
     flight_mode : str = ""
 
 @dataclass
-class PositionMap:
+class MapData:
     lidar_data : np.ndarray = np.empty((1, 3))
     mapbytes : bytearray = bytearray()
     x : float = 0.0

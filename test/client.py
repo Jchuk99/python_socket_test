@@ -20,15 +20,16 @@ def main():
     drone_clients.send_command("START")
     while True:
         try:
-            position_map = drone_clients.get_position_map
+            position_map = drone_clients.get_map_data()
             x = position_map.x
             y = position_map.y
-            theta = position_map.theta
+            theta = position_map.thetagit pu
             mapbytes = position_map.mapbytes
             #print("clients are not blocking main thread")
             # Display map and robot pose, exiting gracefully if user closes it
-            if not viz.display(x/1000., y/1000., theta, mapbytes):
-                exit(0)
+            if mapbytes:
+                if not viz.display(x/1000., y/1000., theta, mapbytes):
+                    exit(0)
             sleep(1)
         except KeyboardInterrupt:
             print('interrupt')
