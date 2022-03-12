@@ -78,7 +78,11 @@ class DroneMap:
                 self.slam.update(previous_distances)
                  # Get current robot position
             x, y, theta = self.slam.getpos()
-
+            print(
+                'x:{}, y:{}, theta:{}'.format(
+                    x,y,theta
+                )
+            )
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
             self.map = MapData(
