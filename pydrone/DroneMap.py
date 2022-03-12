@@ -67,16 +67,15 @@ class DroneMap:
             angles = items[:,1].tolist()
             print(len(distances))
             f = interp1d(angles, distances, fill_value='extrapolate')
-           # distances = list(f(np.arange(360)))
+            distances = list(f(np.arange(360)))
             #print(len(distances))
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
-                self.slam.update(distances, scan_angles_degrees=angles)
+                self.slam.update(distances)
                 previous_distances = distances.copy()
-                previous_angles = angles.copy()
                 # If not adequate, use previous
             elif previous_distances is not None:
-                self.slam.update(previous_distances, scan_angles_degrees=previous_angles)
+                self.slam.update(previous_distances)
                  # Get current robot position
             x, y, theta = self.slam.getpos()
             print(
