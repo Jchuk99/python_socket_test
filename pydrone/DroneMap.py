@@ -68,7 +68,7 @@ class DroneMap:
             print(len(distances))
             f = interp1d(angles, distances, fill_value='extrapolate')
             distances = list(f(np.arange(360)))
-            print(distances)
+            print(len(distances))
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
                 self.slam.update(distances)
@@ -81,7 +81,7 @@ class DroneMap:
 
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
-            self.map = utils.PositionMap(
+            self.map = MapData(
                 items,mapbytes,x,y,theta
             )
             sleep(.1)
