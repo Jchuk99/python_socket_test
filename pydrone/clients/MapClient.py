@@ -8,7 +8,7 @@ import numpy as np
 
 class MapClient:
     def __init__(self, ip_type, protocol, addr):
-        self.map = {
+        self.socket_map = {
             "IPV4" : socket.AF_INET,
             "TCP" : socket.SOCK_STREAM
         }
@@ -17,13 +17,12 @@ class MapClient:
         self.ADDR = addr
 
         self.client = socket.socket(
-            self.map[ip_type.upper()], 
-            self.map[protocol.upper()]
+            self.socket_map[ip_type.upper()], 
+            self.socket_map[protocol.upper()]
         )
 
-        #this np array is currently serving as thread-safe drone_map object
-        self.current_lidar_reading = utils.LockedObject()
-        self.current_lidar_reading = np.empty((1, 3))
+        self.map = utils.LockedObject()
+        self.map = utils.MapData()
 
     def connect(self):
         self.client.connect(self.ADDR)
@@ -48,15 +47,19 @@ class MapClient:
                     self.init_msg_size, 
                     self.init_msg
                 )
+                
+                #TODO: refactor into two different clients?
+                #get lidar data
 
                 data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
-                arr = pickle.loads(self.client.recv(data_length))
-
-                if  arr.size % 3 == 0:
-                    new = np.reshape(arr, (int(arr.size / 3), 3))
-                    self.current_lidar_reading = new
-                print("Map data: " + np.array_str(self.current_lidar_reading))
-                sleep(.1)
+                print(data_length)
+                data = b''
+                while len(data) < data_length:
+                    packet = self.client.recv(4096)
+                    if not packet: break
+                    data += packet
+                self.map = pickle.loads(data)
+                sleep(.05)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")
                 break

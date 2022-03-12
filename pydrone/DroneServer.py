@@ -95,14 +95,14 @@ class DroneServer:
         #print("Sending map data.")
 
         # get data
-        lidar_data = self.drone_map.get_lidar_data()
+        map_data = self.drone_map.get_map_data()
         
         # construct header message/transform numpy lidar readings to byte array
-        byte_lidar_data = pickle.dumps(lidar_data)
+        byte_map_data = pickle.dumps(map_data)
         #print(f"drone lidar data: {byte_lidar_data}")
-
-        header = str(len(byte_lidar_data)).encode('utf-8')
-        utils.send_message(conn, header, byte_lidar_data)
+        
+        header = str(len(byte_map_data)).encode('utf-8')
+        utils.send_message(conn, header, byte_map_data)
 
     def handle_telemetry_client(self, conn):
         #print("Sending telemetry data")

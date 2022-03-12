@@ -1,7 +1,22 @@
+MAP_SIZE_PIXELS         = 500
+MAP_SIZE_METERS         = 10
+LIDAR_DEVICE            = '/dev/ttyUSB0'
+
+# Ideally we could use all 250 or so samples that the RPLidar delivers in one 
+# scan, but on slower computers you'll get an empty map and unchanging position
+# at that rate.
+MIN_SAMPLES   = 200
+
+from breezyslam.algorithms import RMHC_SLAM
+from breezyslam.sensors import RPLidarA1 as LaserModel
+from scipy.interpolate import interp1d
+
+
 import sys
 sys.path.append(".")
 from PyLidar import PyLidar
 from utils import LockedObject
+from utils import MapData
 import subprocess
 import numpy as np
 import threading
@@ -14,7 +29,7 @@ class DroneMap:
     def __init__(self):
         # lidar stuff
         try:
-            self.lidar = PyLidar("COM5", 115200)
+            self.lidar = PyLidar(LIDAR_DEVICE, 115200)
             # connects the lidar using the default port (tty/USB0)
             self.lidar.connect()
             # Starts the lidar motor
@@ -22,9 +37,9 @@ class DroneMap:
         except OSError:
             print("Lidar is not properly connected.")
             sys.exit()
-        
-        self.current_reading = LockedObject()
-        self.current_reading = np.empty((0, 0))
+
+        self.map = LockedObject()
+        self.map = MapData()
 
         #info = self.lidar.get_info()
         #print(info)
@@ -36,19 +51,44 @@ class DroneMap:
 
     def read(self):
         #TODO: this is  where the SLAM algorithm should go 
-        # methods/objects outside of the map should not have any idea about lidar,
-        # lidar scans should be passed into BreezySLAM algorithim to generate map
-        # right now the lidar readings are using lockedObject class, which makes underlying
-        # data collection thread-safe, will want to change that with the actual map object in the futre
-        # unless we want to keep the possiblility of getting botht the map and the lidar readings.
+    
+        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS, hole_width_mm=2000)
+
+        # We will use these to store previous scan in case current scan is inadequate
+        previous_distances = None
+        previous_angles    = None
+
+        # Initialize empty map
+        mapbytes = bytearray(MAP_SIZE_PIXELS * MAP_SIZE_PIXELS)
         while True:
-                start = time.time()
-                self.current_reading = self.lidar.get_lidar_scans_as_np(True)
-                end = time.time()
-                #print("Elapsed time: {}".format(end - start))
-                #print("Frequency (Hz): {}".format(1/(end-start)))
-                print(np.array_str(self.current_reading))
-                sleep(5)
+            items = self.lidar.get_lidar_scans_as_np(True)
+             # Extract distances and angles from triples
+            distances = items[:,2].tolist()
+            angles = items[:,1].tolist()
+            print(len(distances))
+            f = interp1d(angles, distances, fill_value='extrapolate')
+            distances = list(f(np.arange(360)))
+            print(len(distances))
+            # Update SLAM with current Lidar scan and scan angles if adequate
+            if len(distances) > MIN_SAMPLES:
+                self.slam.update(distances)
+                previous_distances = distances.copy()
+                # If not adequate, use previous
+            elif previous_distances is not None:
+                self.slam.update(previous_distances)
+                 # Get current robot position
+            x, y, theta = self.slam.getpos()
+            print(
+                'x:{}, y:{}, theta:{}'.format(
+                    x,y,theta
+                )
+            )
+            # Get current map bytes as grayscale
+            self.slam.getmap(mapbytes)
+            self.map = MapData(
+                items,mapbytes,x,y,theta
+            )
+            sleep(.1)
         pass
 
     def run(self):
@@ -58,10 +98,10 @@ class DroneMap:
     def stop(self):
         print('stopping lidar')
        # self.lidar.stopmotor()
+        self.lidar.disconnect()
         self.lidar_thread.join()
 
-    def get_lidar_data(self):
-         print(self.current_reading.shape)
-         data = self.current_reading
+    def get_map_data(self):
+         data = self.map
          return data
          

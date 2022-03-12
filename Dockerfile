@@ -26,3 +26,4 @@ WORKDIR /home/ardupilot
 RUN git submodule update --init --recursive
 RUN ./waf configure --board sitl
 RUN ./waf copter
+RUN export LD_LIBRARY_PATH="/home/pi/python_socket_test/pydrone/libs/Linux/ARM64"
