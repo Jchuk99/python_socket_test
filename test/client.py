@@ -23,7 +23,7 @@ def main():
             position_map = drone_clients.get_map_data()
             x = position_map.x
             y = position_map.y
-            theta = position_map.thetagit pu
+            theta = position_map.theta
             mapbytes = position_map.mapbytes
             #print("clients are not blocking main thread")
             # Display map and robot pose, exiting gracefully if user closes it
