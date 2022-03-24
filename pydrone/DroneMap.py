@@ -1,5 +1,5 @@
 MAP_SIZE_PIXELS         = 500
-MAP_SIZE_METERS         = 10
+MAP_SIZE_METERS         = 15
 LIDAR_DEVICE            = '/dev/ttyUSB0'
 
 # Ideally we could use all 250 or so samples that the RPLidar delivers in one 
@@ -41,6 +41,9 @@ class DroneMap:
         self.map = LockedObject()
         self.map = MapData()
 
+        self.current_lidar_reading = LockedObject()
+        self.current_lidar_reading = np.empty((1,3))
+
         #info = self.lidar.get_info()
         #print(info)
 
@@ -49,10 +52,22 @@ class DroneMap:
 
         # ultrasonic stuff?
 
-    def read(self):
+    def read_lidar_data(self):
+        while True:
+            self.current_lidar_reading = self.lidar.get_lidar_scans_as_np(True)
+            sleep(.05)
+  
+    def update_map(self):
         #TODO: this is  where the SLAM algorithm should go 
     
-        self.slam = RMHC_SLAM(LaserModel(), MAP_SIZE_PIXELS, MAP_SIZE_METERS, hole_width_mm=2000)
+        self.slam = RMHC_SLAM(
+            LaserModel(), 
+            MAP_SIZE_PIXELS, 
+            MAP_SIZE_METERS, 
+            map_quality=50, 
+            hole_width_mm=2000,
+            max_search_iter=3000
+            )
 
         # We will use these to store previous scan in case current scan is inadequate
         previous_distances = None
@@ -60,15 +75,16 @@ class DroneMap:
 
         # Initialize empty map
         mapbytes = bytearray(MAP_SIZE_PIXELS * MAP_SIZE_PIXELS)
+
         while True:
-            items = self.lidar.get_lidar_scans_as_np(True)
+            items = self.current_lidar_reading
              # Extract distances and angles from triples
             distances = items[:,2].tolist()
             angles = items[:,1].tolist()
-            print(len(distances))
+           # print(len(distances))
             f = interp1d(angles, distances, fill_value='extrapolate')
             distances = list(f(np.arange(360)))
-            print(len(distances))
+            #print(len(distances))
             # Update SLAM with current Lidar scan and scan angles if adequate
             if len(distances) > MIN_SAMPLES:
                 self.slam.update(distances)
@@ -78,28 +94,31 @@ class DroneMap:
                 self.slam.update(previous_distances)
                  # Get current robot position
             x, y, theta = self.slam.getpos()
-            print(
-                'x:{}, y:{}, theta:{}'.format(
-                    x,y,theta
-                )
-            )
+            # print(
+            #     'x:{}, y:{}, theta:{}'.format(
+            #         x,y,theta
+            #     )
+            # )
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
             self.map = MapData(
                 items,mapbytes,x,y,theta
             )
-            sleep(.1)
+
         pass
 
     def run(self):
-        self.lidar_thread = threading.Thread(target = self.read)
+        self.lidar_thread = threading.Thread(target = self.read_lidar_data)
+        self.map_thread = threading.Thread(target = self.update_map)
         self.lidar_thread.start()
+        self.map_thread.start()
 
     def stop(self):
         print('stopping lidar')
        # self.lidar.stopmotor()
         self.lidar.disconnect()
         self.lidar_thread.join()
+        self.map_thread.join()
 
     def get_map_data(self):
          data = self.map

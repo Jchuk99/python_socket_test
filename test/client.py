@@ -12,7 +12,7 @@ MAP_SIZE_METERS         = 10
 def main():
     # map object, telemetry object, SERVER, PORT
     #drone_clients = DroneClients(map, telemetry,"192.168.1.107", 5050 )
-    drone_clients = DroneClients("10.0.0.118", 5050)
+    drone_clients = DroneClients("192.168.1.106", 5050)
     #drone_clients = DroneClients(map, telemetry,"10.0.2.15", 5050 )
     # Set up a SLAM display
     viz = MapVisualizer(MAP_SIZE_PIXELS, MAP_SIZE_METERS, 'SLAM')
@@ -30,7 +30,7 @@ def main():
             if mapbytes:
                 if not viz.display(x/1000., y/1000., theta, mapbytes):
                     exit(0)
-            sleep(1)
+            #sleep(1)
         except KeyboardInterrupt:
             print('interrupt')
             drone_clients.stop()

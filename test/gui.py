@@ -25,7 +25,7 @@ class GroundStation:
 
         self.app = QApplication([])
         self.window = Window()
-        self.drone_clients = DroneClients("10.0.0.118", 5050)
+        self.drone_clients = DroneClients("192.168.1.106", 5050)
         # self.lidar = PyLidar("COM5", 115200)
         # # connects the lidar using the default port (tty/USB0)
         # self.lidar.connect()
@@ -52,8 +52,7 @@ class GroundStation:
     
     def update_lidar_render(self):
         while self.connected:
-            #arr = self.drone_clients.get_map()
-            arr = self.lidar.get_lidar_scans_as_np(True)
+            arr = self.drone_clients.get_map_data().lidar_data
             self.ax.clear()
            # print(arr)
             theta = np.radians(arr[:, 1])
