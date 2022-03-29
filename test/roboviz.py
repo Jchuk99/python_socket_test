@@ -11,6 +11,7 @@ import matplotlib.lines as mlines
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import numpy as np
+from time import sleep
 
 # This helps with Raspberry Pi
 import matplotlib
@@ -142,7 +143,7 @@ class Visualizer(object):
 
         # Refresh display, setting flag on window close or keyboard interrupt
         try:
-            plt.pause(.01) # Arbitrary pause to force redraw
+            sleep(.01) # Arbitrary pause to force redraw
             return True
         except:
             return False
@@ -169,7 +170,7 @@ class MapVisualizer(Visualizer):
         mapimg = np.reshape(np.frombuffer(mapbytes, dtype=np.uint8), (self.map_size_pixels, self.map_size_pixels))
 
         # Pause to allow display to refresh
-        plt.pause(.001)
+        sleep(.01)
 
         if self.img_artist is None:
 

@@ -14,7 +14,11 @@ import matplotlib.animation as animation
 sys.path.append(r"../pydrone")
 sys.path.append(r"../pydrone/clients")
 from PyLidar import PyLidar
+from roboviz import MapVisualizer
 from DroneClients import DroneClients
+
+MAP_SIZE_PIXELS         = 500
+MAP_SIZE_METERS         = 10
 
 class GroundStation:
 
@@ -23,12 +27,12 @@ class GroundStation:
 
         self.app = QApplication([])
         self.window = Window()
-        self.drone_clients = DroneClients("192.168.1.106", 5050)
-        self.lidar = PyLidar("COM5", 115200)
-        # connects the lidar using the default port (tty/USB0)
-        self.lidar.connect()
-        # Starts the lidar motor
-        self.lidar.start_motor()
+        self.drone_clients = DroneClients("10.0.0.118", 5050)
+        # self.lidar = PyLidar("COM5", 115200)
+        # # connects the lidar using the default port (tty/USB0)
+        # self.lidar.connect()
+        # # Starts the lidar motor
+        # self.lidar.start_motor()
         self.connected = False
 
         self.form = Form()
@@ -63,8 +67,8 @@ class GroundStation:
     
     def update_lidar_render(self):
         while self.connected:
-            #arr = self.drone_clients.get_map_data().lidar_data
-            arr = self.lidar.get_lidar_scans_as_np(filter_quality=True)
+            arr = self.drone_clients.get_map_data().lidar_data
+            #arr = self.lidar.get_lidar_scans_as_np(filter_quality=True)
             self.ax.clear()
             theta = np.radians(arr[:, 1])
             self.ax.scatter(theta, arr[:, 2], s = 1)
@@ -76,6 +80,7 @@ class GroundStation:
             env_map = self.drone_clients.get_map_data()
             # Display map and robot pose, exiting gracefully if user closes it
             if env_map.mapbytes:
+                print("hi")
                 if not self.map_viz.display(
                     env_map.x/1000., env_map.y/1000., 
                     env_map.theta, env_map.mapbytes
@@ -86,12 +91,12 @@ class GroundStation:
     def connectDrone(self):
         if not self.connected:
             self.connected = True
-            #self.drone_clients.run()
+            self.drone_clients.run()
             self.lidar_render_thread.start()
             self.map_render_thread.start()
         else:
             self.connected = False
-           # self.drone_clients.stop()
+            self.drone_clients.stop()
             self.lidar_render_thread.join()
             self.map_render_thread.join()
 

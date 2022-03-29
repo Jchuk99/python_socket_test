@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -33,10 +33,10 @@
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>661</width>
-        <height>771</height>
+        <x>-30</x>
+        <y>40</y>
+        <width>1101</width>
+        <height>801</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="lidarGraph"/>
@@ -51,11 +51,11 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>661</width>
+        <width>1101</width>
         <height>771</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout"/>
+      <layout class="QVBoxLayout" name="mapGraph"/>
      </widget>
     </widget>
    </widget>
@@ -63,7 +63,7 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>790</y>
+      <y>830</y>
       <width>1101</width>
       <height>80</height>
      </rect>
@@ -71,13 +71,55 @@
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="stopButton">
+       <property name="baseSize">
+        <size>
+         <width>500</width>
+         <height>500</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color: rgb(227, 227, 227);
+padding: 6px;
+border: 2px solid black;
+border-radius: 1px;
+}
+QPushButton:hover {
+    background-color: lightgreen;
+}
+QPushButton:pressed {
+    background-color: blue;
+    border-style: inset;
+}</string>
+       </property>
        <property name="text">
         <string>STOP</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="startButton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color: rgb(227, 227, 227);
+padding: 6px;
+border: 2px solid black;
+border-radius: 1px;
+}
+QPushButton:hover {
+    background-color: lightgreen;
+}
+QPushButton:pressed {
+    background-color: blue;
+    border-style: inset;
+}</string>
+       </property>
        <property name="text">
         <string>START</string>
        </property>
@@ -85,6 +127,21 @@
      </item>
      <item>
       <widget class="QPushButton" name="disarmButton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color: rgb(227, 227, 227);
+padding: 6px;
+border: 2px solid black;
+border-radius: 1px;
+}
+QPushButton:hover {
+    background-color: lightgreen;
+}
+QPushButton:pressed {
+    background-color: blue;
+    border-style: inset;
+}</string>
+       </property>
        <property name="text">
         <string>DISARM</string>
        </property>
@@ -92,6 +149,21 @@
      </item>
      <item>
       <widget class="QPushButton" name="armButton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color: rgb(227, 227, 227);
+padding: 6px;
+border: 2px solid black;
+border-radius: 1px;
+}
+QPushButton:hover {
+    background-color: lightgreen;
+}
+QPushButton:pressed {
+    background-color: blue;
+    border-style: inset;
+}</string>
+       </property>
        <property name="text">
         <string>ARM</string>
        </property>
@@ -99,6 +171,21 @@
      </item>
      <item>
       <widget class="QPushButton" name="connectButton">
+       <property name="styleSheet">
+        <string notr="true">QPushButton{
+background-color: rgb(227, 227, 227);
+padding: 6px;
+border: 2px solid black;
+border-radius: 1px;
+}
+QPushButton:hover {
+    background-color: lightgreen;
+}
+QPushButton:pressed {
+    background-color: blue;
+    border-style: inset;
+}</string>
+       </property>
        <property name="text">
         <string>CONNECT</string>
        </property>

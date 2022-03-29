@@ -64,9 +64,9 @@ class DroneMap:
             LaserModel(), 
             MAP_SIZE_PIXELS, 
             MAP_SIZE_METERS, 
-            map_quality=50, 
-            hole_width_mm=2000,
-            max_search_iter=3000
+            map_quality=45, 
+            hole_width_mm=1000,
+            max_search_iter=4000
             )
 
         # We will use these to store previous scan in case current scan is inadequate
@@ -94,11 +94,11 @@ class DroneMap:
                 self.slam.update(previous_distances)
                  # Get current robot position
             x, y, theta = self.slam.getpos()
-            # print(
-            #     'x:{}, y:{}, theta:{}'.format(
-            #         x,y,theta
-            #     )
-            # )
+            print(
+                'x:{}, y:{}, theta:{}'.format(
+                    x,y,theta
+                )
+            )
             # Get current map bytes as grayscale
             self.slam.getmap(mapbytes)
             self.map = MapData(
