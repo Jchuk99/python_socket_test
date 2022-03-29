@@ -78,32 +78,34 @@ class DroneMap:
 
         while True:
             items = self.current_lidar_reading
-             # Extract distances and angles from triples
-            distances = items[:,2].tolist()
-            angles = items[:,1].tolist()
-           # print(len(distances))
-            f = interp1d(angles, distances, fill_value='extrapolate')
-            distances = list(f(np.arange(360)))
-            #print(len(distances))
-            # Update SLAM with current Lidar scan and scan angles if adequate
-            if len(distances) > MIN_SAMPLES:
-                self.slam.update(distances)
-                previous_distances = distances.copy()
-                # If not adequate, use previous
-            elif previous_distances is not None:
-                self.slam.update(previous_distances)
-                 # Get current robot position
-            x, y, theta = self.slam.getpos()
-            print(
-                'x:{}, y:{}, theta:{}'.format(
-                    x,y,theta
+            num_rows, num_cols = items.shape
+            if num_rows > 2 :
+                # Extract distances and angles from triples
+                distances = items[:,2].tolist()
+                angles = items[:,1].tolist()
+            # print(len(distances))
+                f = interp1d(angles, distances, fill_value='extrapolate')
+                distances = list(f(np.arange(360)))
+                #print(len(distances))
+                # Update SLAM with current Lidar scan and scan angles if adequate
+                if len(distances) > MIN_SAMPLES:
+                    self.slam.update(distances)
+                    previous_distances = distances.copy()
+                    # If not adequate, use previous
+                elif previous_distances is not None:
+                    self.slam.update(previous_distances)
+                    # Get current robot position
+                x, y, theta = self.slam.getpos()
+                print(
+                    'x:{}, y:{}, theta:{}'.format(
+                        x,y,theta
+                    )
                 )
-            )
-            # Get current map bytes as grayscale
-            self.slam.getmap(mapbytes)
-            self.map = MapData(
-                items,mapbytes,x,y,theta
-            )
+                # Get current map bytes as grayscale
+                self.slam.getmap(mapbytes)
+                self.map = MapData(
+                    items,mapbytes,x,y,theta
+                )
 
         pass
 
