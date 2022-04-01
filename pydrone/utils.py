@@ -41,14 +41,19 @@ class Telemetry:
 @dataclass
 class MapData:
     lidar_data : np.ndarray = np.empty((1, 3))
-    mapbytes :  np.ndarray = np.empty((MAP_SIZE_PIXELS , MAP_SIZE_PIXELS))
+    mapbytes:  bytearray = bytearray()
     x : float = 0.0 # mm
     y : float = 0.0 # mm
-    theta : float = 0.0
+    theta : float = 0.0 # degrees
+    
+    def get_np_map(self):
+        map_arr = np.frombuffer(self.mapbytes, dtype=np.uint8, count=-1)
+        map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
+        return map_arr
 
     def __str__(self):
         string = 'x: {} mm, y: {} mm, theta: {} degrees\n map: {}'.format(
-            self.x, self.y, self.theta, map_arr
+            self.x, self.y, self.theta, self.get_np_map()
         )
         return string
 

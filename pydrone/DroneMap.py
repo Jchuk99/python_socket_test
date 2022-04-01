@@ -100,10 +100,8 @@ class DroneMap:
                 )
                 # Get current map bytes as grayscale
                 self.slam.getmap(mapbytes)
-                map_arr = np.frombuffer(mapbytes, dtype=np.uint8, count=-1)
-                map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
                 self.map = MapData(
-                    items,map_arr,x,y,theta
+                    items,mapbytes,x,y,theta
                 )
 
         pass
