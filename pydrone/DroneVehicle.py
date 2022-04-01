@@ -48,7 +48,6 @@ class DroneVehicle:
 
 	def start(self, targetAlt):
 		
-		
 		self.running = True
 
 		thread = threading.Thread(target=self.read)

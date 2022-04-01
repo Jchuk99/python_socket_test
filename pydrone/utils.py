@@ -2,6 +2,8 @@ from dataclasses import dataclass
 import numpy as np
 import threading
 import copy
+MAP_SIZE_PIXELS         = 500
+MAP_SIZE_METERS         = 10
 HEADER = 64
 
 # MESSAGE PROTOCOL:
@@ -26,13 +28,29 @@ class Telemetry:
     groundspeed : float = 0.0
     flight_mode : str = ""
 
+    def __str__(self):
+        string = """altitude: {} m, pitch: {}, yaw: {}, roll: {},
+            velocity: {}, airspeed: {}, groundspeed: {}, flight_mode: {}
+            """.format(
+            self.altitude, self.pitch, self.yaw, self.roll,
+            self.velocity, self.airspeed, self.groundspeed, 
+            self.flight_mode,
+        )
+        return string
+
 @dataclass
 class MapData:
     lidar_data : np.ndarray = np.empty((1, 3))
-    mapbytes : bytearray = bytearray()
-    x : float = 0.0
-    y : float = 0.0
+    mapbytes :  np.ndarray = np.empty((MAP_SIZE_PIXELS , MAP_SIZE_PIXELS))
+    x : float = 0.0 # mm
+    y : float = 0.0 # mm
     theta : float = 0.0
+
+    def __str__(self):
+        string = 'x: {} mm, y: {} mm, theta: {} degrees\n map: {}'.format(
+            self.x, self.y, self.theta, map_arr
+        )
+        return string
 
 
 # haven't tested on non numpy objects
@@ -60,7 +78,7 @@ class LockedObject(object):
 
     def __set__(self, obj, val):
         self.lock.acquire()
-        # print('setting', val
+        # print('setting', val)
         # speed up for nparrays
         if isinstance(val, np.ndarray):
             self.val = val.copy()

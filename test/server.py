@@ -43,12 +43,14 @@ def main():
                     print("Direction: NORTH relative to heading of drone")
                     print("Velocity: %s" % drone_vehicle.telemetry)
                     sleep(1)
-                    c=c+1
-
-                
+                    c=c+1            
                 print('drone is starting')
             elif message == 'STOP':
                 print('drone is stopping')
+            elif message == 'ARM':
+                print('drone is arming')
+            elif message == 'DISARM':
+                print('drone is disarming')
         else:
             try:
                 #print("drone server is not blocking")

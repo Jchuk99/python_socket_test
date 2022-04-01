@@ -1,5 +1,5 @@
 MAP_SIZE_PIXELS         = 500
-MAP_SIZE_METERS         = 15
+MAP_SIZE_METERS         = 10
 LIDAR_DEVICE            = '/dev/ttyUSB0'
 
 # Ideally we could use all 250 or so samples that the RPLidar delivers in one 
@@ -58,13 +58,11 @@ class DroneMap:
             sleep(.05)
   
     def update_map(self):
-        #TODO: this is  where the SLAM algorithm should go 
-    
         self.slam = RMHC_SLAM(
             LaserModel(), 
             MAP_SIZE_PIXELS, 
             MAP_SIZE_METERS, 
-            map_quality=45, 
+            map_quality=40, 
             hole_width_mm=1000,
             max_search_iter=4000
             )
@@ -83,10 +81,9 @@ class DroneMap:
                 # Extract distances and angles from triples
                 distances = items[:,2].tolist()
                 angles = items[:,1].tolist()
-            # print(len(distances))
                 f = interp1d(angles, distances, fill_value='extrapolate')
                 distances = list(f(np.arange(360)))
-                #print(len(distances))
+
                 # Update SLAM with current Lidar scan and scan angles if adequate
                 if len(distances) > MIN_SAMPLES:
                     self.slam.update(distances)
@@ -103,8 +100,10 @@ class DroneMap:
                 )
                 # Get current map bytes as grayscale
                 self.slam.getmap(mapbytes)
+                map_arr = np.frombuffer(self.mapbytes, dtype=np.uint8, count=-1)
+                map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
                 self.map = MapData(
-                    items,mapbytes,x,y,theta
+                    items,map_arr,x,y,theta
                 )
 
         pass

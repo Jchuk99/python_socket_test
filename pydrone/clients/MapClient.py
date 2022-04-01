@@ -48,11 +48,10 @@ class MapClient:
                     self.init_msg
                 )
                 
-                #TODO: refactor into two different clients?
-                #get lidar data
-
+                #TODO: add logger to system
+                
                 data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
-                print(data_length)
+                #print(data_length)
                 data = b''
                 while len(data) < data_length:
                     packet = self.client.recv(4096)

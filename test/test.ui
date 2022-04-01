@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>1121</width>
+      <width>1131</width>
       <height>771</height>
      </rect>
     </property>
@@ -32,7 +32,7 @@ border-radius: 1px;
 }</string>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -42,12 +42,31 @@ border-radius: 1px;
       <property name="geometry">
        <rect>
         <x>-30</x>
-        <y>40</y>
-        <width>1131</width>
-        <height>711</height>
+        <y>0</y>
+        <width>1001</width>
+        <height>751</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="lidarGraph"/>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>970</x>
+        <y>0</y>
+        <width>131</width>
+        <height>751</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="saveLidarButton">
+         <property name="text">
+          <string>Save Current Lidar Scan</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -59,11 +78,30 @@ border-radius: 1px;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1151</width>
-        <height>771</height>
+        <width>971</width>
+        <height>751</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="mapGraph"/>
+     </widget>
+     <widget class="QWidget" name="verticalLayoutWidget_6">
+      <property name="geometry">
+       <rect>
+        <x>970</x>
+        <y>0</y>
+        <width>131</width>
+        <height>751</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QPushButton" name="saveMapButton">
+         <property name="text">
+          <string>Save Current Map</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </widget>
@@ -72,7 +110,7 @@ border-radius: 1px;
      <rect>
       <x>10</x>
       <y>770</y>
-      <width>1121</width>
+      <width>1131</width>
       <height>121</height>
      </rect>
     </property>
@@ -101,12 +139,13 @@ padding: 6px;
 margin: 6px;
 border: 2px solid black;
 border-radius: 1px;
+font-weight: bold;
 }
 QPushButton:hover {
-    background-color: lightgreen;
+    background-color: rgb(255, 0, 0);
 }
 QPushButton:pressed {
-    background-color: rgb(255, 0, 0);
+    background-color: rgb(85, 0, 0);
     border-style: inset;
 }</string>
        </property>
@@ -130,12 +169,13 @@ padding: 6px;
 margin: 6px;
 border: 2px solid black;
 border-radius: 1px;
+font-weight: bold;
 }
 QPushButton:hover {
     background-color: lightgreen;
 }
 QPushButton:pressed {
-    background-color: blue;
+    background-color: green;
     border-style: inset;
 }</string>
        </property>
@@ -153,6 +193,7 @@ padding: 6px;
 margin: 6px;
 border: 2px solid black;
 border-radius: 1px;
+font-weight: bold;
 }
 QPushButton:hover {
     background-color: lightgreen;
@@ -175,6 +216,7 @@ background-color: rgb(227, 227, 227);
 padding: 6px;
 margin: 6px;
 border: 2px solid black;
+font-weight: bold;
 border-radius: 1px;
 }
 QPushButton:hover {
@@ -199,12 +241,13 @@ padding: 6px;
 margin: 6px;
 border: 2px solid black;
 border-radius: 1px;
+font-weight: bold;
 }
 QPushButton:hover {
-    background-color: lightgreen;
+    background-color: yellow;
 }
 QPushButton:pressed {
-    background-color: blue;
+    background-color: rgb(255, 170, 0);
     border-style: inset;
 }</string>
        </property>

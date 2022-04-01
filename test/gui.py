@@ -54,6 +54,14 @@ class GroundStation:
 
         self.form.tabWidget.currentChanged.connect(self.tabChanged)
         self.form.connectButton.clicked.connect(self.connectDrone)
+        self.form.startButton.clicked.connect(self.start_command)
+        self.form.stopButton.clicked.connect(self.stop_command)
+        self.form.armButton.clicked.connect(self.arm_command)
+        self.form.disarmButton.clicked.connect(self.disarm_command)
+
+        self.form.saveLidarButton.clicked.connect(self.save_lidar_data)
+        self.form.saveMapButton.clicked.connect(self.save_map_data)
+        #self.form.saveTelemetryButton.clicked.connect(self.save_telemetry_data)
 
         self.lidar_render_thread = Thread(target = self.update_lidar_render)
         self.map_render_thread = Thread(target = self.update_map_render)
@@ -80,7 +88,6 @@ class GroundStation:
             env_map = self.drone_clients.get_map_data()
             # Display map and robot pose, exiting gracefully if user closes it
             if env_map.mapbytes:
-                print("hi")
                 if not self.map_viz.display(
                     env_map.x/1000., env_map.y/1000., 
                     env_map.theta, env_map.mapbytes
@@ -99,6 +106,33 @@ class GroundStation:
             self.drone_clients.stop()
             self.lidar_render_thread.join()
             self.map_render_thread.join()
+
+    def start_command(self):
+        if self.connected:
+            self.drone_clients.send_command("START")
+    def stop_command(self):
+        if self.connected:
+            self.drone_clients.send_command("STOP")
+    def arm_command(self):
+        if self.connected:
+            self.drone_clients.send_command("ARM")
+    def disarm_command(self):
+        if self.connected:
+            self.drone_clients.send_command("DISARM")
+    
+    def save_lidar_data(self):
+        if self.connected:
+            print("saving lidar data")
+
+    def save_map_data(self):
+        # don't want numpy array to be truncated
+        np.set_printoptions(threshold=np.inf)
+        if self.connected:
+            with open("map_data.txt", "w", encoding='utf-8') as file:
+                file.write(str(self.drone_clients.get_map_data()))
+        # set back to original value
+        np.set_printoptions(threshold=1000)
+
 
 def main():
     gs = GroundStation()
