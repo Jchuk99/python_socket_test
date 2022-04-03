@@ -16,8 +16,8 @@ def main():
 
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
-
-    drone_vehicle = DroneVehicle('127.0.0.1', 5760)
+ 
+    drone_vehicle = DroneVehicle()
     #drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
     drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"192.168.1.111", 5050)
    # drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
@@ -33,17 +33,7 @@ def main():
                 # drone_map to run obstacle avoidance using provided info,
                 # drone_telemetry
                 # a shutdown signal that we can use to stop whenever the stop command starts
-                drone_vehicle.start(2)
-                #print(" Altitude: ", drone_vehicle.location.global_relative_frame.alt)
-                print("Velocity: %s" % drone_vehicle.telemetry)
-
-                c = 0
-                while c<2:
-                    drone_vehicle.setV(1,0,0)
-                    print("Direction: NORTH relative to heading of drone")
-                    print("Velocity: %s" % drone_vehicle.telemetry)
-                    sleep(1)
-                    c=c+1            
+                drone_vehicle.run()
                 print('drone is starting')
             elif message == 'STOP':
                 print('drone is stopping')

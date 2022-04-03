@@ -109,16 +109,16 @@ class GroundStation:
 
     def start_command(self):
         if self.connected:
-            self.drone_clients.send_command("START")
+            self.drone_clients.send_command('START')
     def stop_command(self):
         if self.connected:
-            self.drone_clients.send_command("STOP")
+            self.drone_clients.send_command('STOP')
     def arm_command(self):
         if self.connected:
-            self.drone_clients.send_command("ARM")
+            self.drone_clients.send_command('ARM')
     def disarm_command(self):
         if self.connected:
-            self.drone_clients.send_command("DISARM")
+            self.drone_clients.send_command('DISARM')
     
     def save_lidar_data(self):
         if self.connected:

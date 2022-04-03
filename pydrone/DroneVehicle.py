@@ -14,22 +14,25 @@ import argparse
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, server, port):
-		self.addr = f'tcp:{server}:{port}'
-		#'tcp:127.0.0.1:5760'
+	def __init__(self, drone_map):
 		#connect to flight controller
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
+		self.drone_map = drone_map
 		self.isRunning = utils.LockedObject()
 		self.isRunning = False
 		self.telemetry = utils.LockedObject()
 		self.telemetry = utils.Telemetry()
+
+		self.telemetry_thread = threading.Thread(target=self.read)
+		self.vehicle_thread = threading.Thread(target=self.start)
+
 		print(self.addr)
-		#self.vehicle = connect('udp:127.0.0.1:14551', wait_ready=True)
+		self.vehicle = connect('udp:127.0.0.0:14551', wait_ready=True)
 		#self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
 	def read(self):
-		while True:
+		while self.running:
 			self.telemetry = utils.Telemetry(
 				self.vehicle.location.global_relative_frame.alt,
 				self.vehicle.attitude.pitch,
@@ -40,24 +43,17 @@ class DroneVehicle:
 				self.vehicle.groundspeed,
 				self.vehicle.mode.name
 			)
-
 			sleep(2)
-			if not self.running:
-				break
 
 
+	def run(self):
+		self.vehicle_thread.start()
+		
 	def start(self, targetAlt):
 		
 		self.running = True
 
-		thread = threading.Thread(target=self.read)
-		thread.start()
-
-		print("Basic pre-arm checks")
-		# Don't try to arm until autopilot is ready
-		while not self.vehicle.is_armable:
-			print(" Waiting for vehicle to initialise...")
-			time.sleep(1)
+		self.telemetry_thread.start()
 
 		print("Arming motors")
 		# Copter should arm in GUIDED mode
@@ -82,6 +78,14 @@ class DroneVehicle:
 				print("Reached target altitude")
 				break
 			time.sleep(1)
+
+		while self.running:
+			# obstacle detection goes here
+
+	def stop(self):
+		self.vehicle.mode = VehicleMode("LANDING")
+		self.running = False
+
 
 	def setV(self, Vx, Vy, Vz):
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
