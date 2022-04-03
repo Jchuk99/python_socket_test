@@ -1,0 +1,13 @@
+1.git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+2.git clone https://github.com/Jchuk99/python_socket_test.git ~/
+3.git submodule update --init --recursive
+4.cd to python_socket_test/pydrone/BreezySLAM
+5.Add negative in front of coreslam.c line 319 to account for lidar counterclockwise rotation
+6.sudo python3 setup.py install
+7./etc/profile add the following:
+	HOME="/home"
+	PYENV_ROOT="${HOME}/.pyenv"
+	PATH="${PYENV_ROOT}/shims:${PYENV_ROOT}/bin:${PATH}" (sets up python environment)
+	export LD_LIBRARY_PATH="/home/pi/python_socket_test/pydrone/libs/Linux/ARM64" (sets up lidar
+
+
