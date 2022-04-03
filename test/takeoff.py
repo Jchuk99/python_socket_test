@@ -4,19 +4,22 @@ import threading
 import time
 import socket
 import argparse
+import math
 
 
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, telemetry_data, server, port):
-		self.addr = f'tcp:{server}:{port}'
+	def __init__(self):#, telemetry_data, server, port):
+		#self.addr = f'tcp:{server}:{port}'
+		self.addr = f'tcp:127.0.0.1:5760'
+		
 		#'tcp:127.0.0.1:5760'
 		#connect to flight controller
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
-		self.isRunning = utils.LockedObject()
+		#self.isRunning = utils.LockedObject()
 		self.isRunning = False
-		self.telemetry = telemetry_data
+		#self.telemetry = telemetry_data
 		self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
@@ -86,13 +89,114 @@ class DroneVehicle:
 				0,0,0,
 				0,0)
 		self.vehicle.send_mavlink(msg)
-		self.vehicle.flush()
+		self.vehicle.flush()		
+	
+	def foundObjT(self,y,y,theta):
+		#fix theta
+		if theta > 360:
+			while theta > 360:
+				theta = theta-360
+		elif theta < 0:
+			theta = theta*-1
+			
+		newX = (-math.cos(math.radians(theta)))*2
+		newY = (0math.sin(math.radians(theta)))*2
+		
+		self.setV(newY, newX, 0)
+	
+	def foundObj(self, x,y,theta):
+		#checks edge cases
+		if x==0:
+			if y>0:
+				self.setV(-1,0,0)
+			elif y<0:
+				self.setV(1,0,0)
+		elif y==0:
+			if x>0:
+				self.setV(0,-1,0)
+			elif x<0:
+				self.setV(0,1,0)
+		#take constant ratio and reduce
+		elif y!=0 and x!=0:			
+			if abs(x) > abs(y):
+				k = y/x
+			else:
+				k = x/y
+			
+			if k < 0:
+				k = k*(-1)
+			
+			if abs(x) > abs(y):
+				newX = 1						
+				newY = newX*k
+			else:
+				newY = 1
+				newX = newY*k
+			
+			if x > 0:
+				newX = newX*(-1)
+			
+			if y > 0:
+				newY = newY*(-1)
+			
+			self.setV(newY,newX,0)
+			
+		def returnToBase(self):
+			self.vehicle.mode = VehicleMode("RTL")
+		
+		def stopMov(self):
+			self.setV(0,0,0)
+			
+		def land(self):
+			self.vehicle.mode = VehicleMode("LAND")
+	
+	def parseMapData(self,x_old,y_old,theta,data):
+		#mm -> m
+		x = y_old/1000
+		y = x_old/1000
+		
+		#m => pixels
+		x = x/0.02
+		y = y/0.02
+		
+		s = math.sqrt(data.size)
+		
+		x_min = x-25
+		x_max = x+25
+		y_min = y-25
+		y_max = y+25
+		
+		if x_min < 0:
+			x_min = 0
+			
+		if y_min < 0:
+			y_min = 0
+		
+		if x_max > s:
+			x_max = s
+		
+		if y_max > s:
+			y_max = s
+		
+		i = x_min
+		y = y_min
+		
+		while(j < y_max):
+			while (i < x_max):
+				if data[i,j] > 127:
+					foundObj(i,j,theta)
+					time.sleep(5)
+					#revisit this to solve for drone returning to base only after objec is gone
+					break
+					
+			
+		
 
 start(2)
 print(" Altitude: ", vehicle.location.global_relative_frame.alt)
 print("Velocity: %s" % vehicle.velocity)
 
-c = 0
+'''c = 0
 while c<2:
 	setV(1,0,0)
 	print("Direction: NORTH relative to heading of drone")
@@ -128,3 +232,4 @@ while c<2:
 	c=c+1
 
 print("Velocity: %s" % vehicle.velocity)
+'''

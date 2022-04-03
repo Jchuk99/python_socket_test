@@ -84,7 +84,12 @@ class DroneVehicle:
 		while self.running:
 			self.vehicle.mode = VehicleMode("LAND")
 			# obstacle detection goes here
-
+			
+			
+			parseMapData(self.drone_map.map.x,self.drone_map.map.y,self.drone_map.map.theta,self.drone_map.map.get_map_as_np())
+	
+	
+	
 	def stop(self):
 		self.vehicle.mode = VehicleMode("LAND")
 		self.running = False
@@ -102,4 +107,115 @@ class DroneVehicle:
 				0,0)
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
+		
+	def foundObjT(self,y,y,theta):
+		#fix theta
+		if theta > 360:
+			while theta > 360:
+				theta = theta-360
+		elif theta < 0:
+			theta = theta*-1
+			
+		newX = (-math.cos(math.radians(theta)))*2
+		newY = (-math.sin(math.radians(theta)))*2
+		
+		self.setV(newY, newX, 0)
+	
+	def foundObj(self, x,y,theta):
+		#checks edge cases
+		if x==0:
+			if y>0:
+				self.setV(-1,0,0)
+			elif y<0:
+				self.setV(1,0,0)
+		elif y==0:
+			if x>0:
+				self.setV(0,-1,0)
+			elif x<0:
+				self.setV(0,1,0)
+		#take constant ratio and reduce
+		elif y!=0 and x!=0:			
+			if abs(x) > abs(y):
+				k = y/x
+			else:
+				k = x/y
+			
+			if k < 0:
+				k = k*(-1)
+			
+			#create new velocities
+			if abs(x) > abs(y):
+				newX = 1						
+				newY = newX*k
+			else:
+				newY = 1
+				newX = newY*k
+			
+			#set correct sign
+			if x > 0:
+				newX = newX*(-1)
+			
+			if y > 0:
+				newY = newY*(-1)
+			
+			#set velocity
+			self.setV(newY,newX,0)
+			
+		def returnToBase(self):
+			self.vehicle.mode = VehicleMode("RTL")
+		
+		def stopMov(self):
+			self.setV(0,0,0)
+			
+		def land(self):
+			self.vehicle.mode = VehicleMode("LAND")
+	
+	def parseMapData(self,x_old,y_old,theta,data):
+		#mm -> m
+		x = y_old/1000
+		y = x_old/1000
+		
+		#m => pixels
+		x = x/0.02
+		y = y/0.02
+		
+		#max range
+		s = math.sqrt(data.size)
+		#radius in meters
+		rad = .5
+		#m -> pixels
+		ran = rad/.02
+		
+		#radius of drone detection
+		x_min = x-rad
+		x_max = x+rad
+		y_min = y-rad
+		y_max = y+rad
+		
+		#adjust for out of bounds
+		if x_min < 0:
+			x_min = 0
+			
+		if y_min < 0:
+			y_min = 0
+		
+		if x_max > s:
+			x_max = s
+		
+		if y_max > s:
+			y_max = s
+		
+		#iterators
+		i = x_min
+		j = y_min
+		
+		#check range of pixels
+		while(j < y_max):
+			while (i < x_max):
+				if data[i,j] > 127:
+					foundObj(i,j,theta)
+					time.sleep(5)
+					#revisit this to solve for drone returning to base only after object is gone
+					#current idea, just let loop run and see what happens
+					break
 
