@@ -18,9 +18,8 @@ def main():
     # will give map/telemetry data through map and telemetry data structures
  
     drone_vehicle = DroneVehicle(drone_map)
-    #drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
     drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"192.168.1.111", 5050)
-   # drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
+    #drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
     
     drone_map.run()
     drone_server.run()
@@ -31,10 +30,8 @@ def main():
                 # AKA we start a new thread to get the drone to hover, and run obstacle avoidance
                 # give this thread: 
                 # drone_map to run obstacle avoidance using provided info,
-                # drone_telemetry
-                # a shutdown signal that we can use to stop whenever the stop command starts
-                drone_vehicle.run()
                 print('drone is starting')
+                drone_vehicle.run()
             elif message == 'STOP':
                 print('drone is stopping')
             elif message == 'ARM':

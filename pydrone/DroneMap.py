@@ -55,7 +55,7 @@ class DroneMap:
     def read_lidar_data(self):
         while True:
             self.current_lidar_reading = self.lidar.get_lidar_scans_as_np(True)
-            sleep(.05)
+            sleep(.1)
   
     def update_map(self):
         self.slam = RMHC_SLAM(
@@ -93,17 +93,17 @@ class DroneMap:
                     self.slam.update(previous_distances)
                     # Get current robot position
                 x, y, theta = self.slam.getpos()
-                print(
-                    'x:{}, y:{}, theta:{}'.format(
-                        x,y,theta
-                    )
-                )
+               # print(
+               #     'x:{}, y:{}, theta:{}'.format(
+               #         x,y,theta
+               #      )
+               # )
                 # Get current map bytes as grayscale
                 self.slam.getmap(mapbytes)
                 self.map = MapData(
                     items,mapbytes,x,y,theta
                 )
-            sleep(.1)
+            sleep(.01)
 
         pass
 

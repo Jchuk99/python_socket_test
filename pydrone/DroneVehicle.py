@@ -80,9 +80,9 @@ class DroneVehicle:
 				break
 			time.sleep(1)
 
+		print("attempting to land")
 		while self.running:
 			self.vehicle.mode = VehicleMode("LAND")
-			print("running")
 			# obstacle detection goes here
 
 	def stop(self):
