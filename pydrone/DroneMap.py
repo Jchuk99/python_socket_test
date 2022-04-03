@@ -103,6 +103,7 @@ class DroneMap:
                 self.map = MapData(
                     items,mapbytes,x,y,theta
                 )
+            sleep(.1)
 
         pass
 

@@ -57,8 +57,7 @@ class MapData:
         map_arr = self.get_map_as_np()
         map_arr = map_arr < 128
         map_arr = map_arr.astype(int)
-        df = pd.DataFrame(map_arr)
-        return df
+        return map_arr
     
     def get_x_pixel(self):
         meters = self.x / 1000.0
