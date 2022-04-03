@@ -1,3 +1,4 @@
+
 from dronekit import VehicleMode, connect, LocationGlobalRelative
 import sys
 sys.path.append(".")
@@ -26,8 +27,7 @@ class DroneVehicle:
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
 
-		print(self.addr)
-		self.vehicle = connect('udp:127.0.0.0:14551', wait_ready=True)
+		self.vehicle = connect('udp:127.0.0.1:14550', wait_ready=True)
 		#self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
@@ -47,10 +47,11 @@ class DroneVehicle:
 
 
 	def run(self):
+		self.vehicle_thread = threading.Thread(target=self.start, args=(1,))
 		self.vehicle_thread.start()
-		
+
 	def start(self, targetAlt):
-		
+
 		self.running = True
 
 		self.telemetry_thread.start()
@@ -80,10 +81,11 @@ class DroneVehicle:
 			time.sleep(1)
 
 		while self.running:
+			self.vehicle.mode = VehicleMode("LAND")
 			print("running")
 			# obstacle detection goes here
 
-    def stop(self):
+	def stop(self):
 		self.vehicle.mode = VehicleMode("LANDING")
 		self.running = False
 

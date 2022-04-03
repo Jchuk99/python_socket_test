@@ -17,7 +17,7 @@ def main():
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
  
-    drone_vehicle = DroneVehicle()
+    drone_vehicle = DroneVehicle(drone_map)
     #drone_server = DroneServer(drone_map, telemetry, message_queue, '192.168.1.107', 5050)
     drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"192.168.1.111", 5050)
    # drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
