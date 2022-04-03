@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 import numpy as np
+import pandas as pd
 import threading
 import copy
 MAP_SIZE_PIXELS         = 500
 MAP_SIZE_METERS         = 10
+MAP_SCALE_METERS_PER_PIXEL = MAP_SIZE_METERS / float(MAP_SIZE_PIXELS)
 HEADER = 64
 
 # MESSAGE PROTOCOL:
@@ -45,15 +47,31 @@ class MapData:
     x : float = 0.0 # mm
     y : float = 0.0 # mm
     theta : float = 0.0 # degrees
-    
-    def get_np_map(self):
+
+    def get_map_as_np(self):
         map_arr = np.frombuffer(self.mapbytes, dtype=np.uint8, count=-1)
         map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
         return map_arr
+    
+    def get_occupancy_grid(self):
+        map_arr = self.get_map_as_np()
+        map_arr = map_arr < 128
+        map_arr = map_arr.astype(int)
+        df = pd.DataFrame(map_arr)
+        return df
+    
+    def get_x_pixel(self):
+        meters = self.x / 1000.0
+        return meters/MAP_SCALE_METERS_PER_PIXEL
+
+    def get_y_pixel(self):
+        meters = self.y / 1000.0
+        return meters/MAP_SCALE_METERS_PER_PIXEL
 
     def __str__(self):
-        string = 'x: {} mm, y: {} mm, theta: {} degrees\n map: {}'.format(
-            self.x, self.y, self.theta, self.get_np_map()
+        df = pd.DataFrame(self.get_occupancy_grid())
+        string = 'x: {} mm, y: {} mm, theta: {} degrees\n map:\n{}'.format(
+            self.get_x_pixel(), self.get_y_pixel(), self.theta, df.to_string(header=True ,index=True)
         )
         return string
 
