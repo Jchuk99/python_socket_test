@@ -128,7 +128,8 @@ class GroundStation:
         # don't want numpy array to be truncated
         np.set_printoptions(threshold=np.inf)
         if self.connected:
-            with open("map_data.txt", "w", encoding='utf-8') as file:
+            np.savetxt('map_data.txt', self.drone_clients.get_map_data().get_occupancy_grid(), delimiter=',') 
+            with open("position.txt", "w", encoding='utf-8') as file:
                 file.write(str(self.drone_clients.get_map_data()))
         # set back to original value
         np.set_printoptions(threshold=1000)

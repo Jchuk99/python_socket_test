@@ -15,7 +15,7 @@ import argparse
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, drone_map):
+	def __init__(self, drone_map = None):
 		#connect to flight controller
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
 		self.drone_map = drone_map
@@ -219,4 +219,19 @@ class DroneVehicle:
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
 					break
+
+
+if __name__ == "__main__":
+	map_data = None
+	x, y, theta = None
+	drone_vehicle = DroneVehicle(drone_map)
+    with open("../test/data/map_data/position.txt", "w") as file:
+        position = f.readline().split(" ")
+		x = position[0]
+		y = position[1]
+		theta = position[2]
+	map_data = numpy.loadtxt("../test/data/map_data/position.txt", dtype=uint8, delimeter=',')
+	parseMapData(x, y, theta, map_data)
+
+
 

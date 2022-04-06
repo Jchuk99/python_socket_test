@@ -67,11 +67,9 @@ class MapData:
         meters = self.y / 1000.0
         return meters/MAP_SCALE_METERS_PER_PIXEL
 
+
     def __str__(self):
-        df = pd.DataFrame(self.get_occupancy_grid())
-        string = 'x: {} mm, y: {} mm, theta: {} degrees\n map:\n{}'.format(
-            self.get_x_pixel(), self.get_y_pixel(), self.theta, df.to_string(header=True ,index=True)
-        )
+        string = '{} {} {}'.format(self.x, self.y, self.theta)
         return string
 
 
