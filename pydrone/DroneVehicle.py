@@ -262,7 +262,7 @@ class DroneVehicle:
 		while(j < y_max):
 			i = int(x_min)
 			while (i < x_max):
-				if data[i, j] < 128:
+				if data[i, j] == 1:
 					print(data[i,j])
 					print("\ni: " + str(i) + "\nj: " + str(j))
 					self.foundObj(i,j,theta,x_max,y_max,ran)
