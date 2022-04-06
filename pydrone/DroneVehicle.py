@@ -227,7 +227,7 @@ class DroneVehicle:
 		x = x/0.02
 		y = y/0.02
 		
-		print("x :" + str(x) + "\ny:" + str(y))
+		print("x :" + str(x) + "\ny: " + str(y))
 		#max range
 		s = math.sqrt(data.size)
 		#radius in meters
@@ -236,10 +236,10 @@ class DroneVehicle:
 		ran = rad/.02
 		
 		#radius of drone detection
-		x_min = x-rad
-		x_max = x+rad
-		y_min = y-rad
-		y_max = y+rad
+		x_min = x-ran
+		x_max = x+ran
+		y_min = y-ran
+		y_max = y+ran
 		
 		#adjust for out of bounds
 		if x_min < 0:
@@ -258,10 +258,16 @@ class DroneVehicle:
 		i = int(x_min)
 		j = int(y_min)
 		
+		print(x_max)
+		print(x_min)
+		print(y_max)
+		print(y_min)
+		z = 0
 		#check range of pixels
 		while(j < y_max):
 			i = int(x_min)
 			while (i < x_max):
+				#print(data[i, j])
 				if data[i, j] == 1:
 					print(data[i,j])
 					print("\ni: " + str(i) + "\nj: " + str(j))
@@ -273,6 +279,8 @@ class DroneVehicle:
 				i = i + 1
 
 			j = j + 1
+			z = z+1
+		print(z)
 				
 
 
@@ -282,13 +290,13 @@ if __name__ == "__main__":
 	y = None
 	theta = None
 	drone_vehicle = DroneVehicle(connect=False)
-	with open("../test/data/map_data/position_1.txt", "r") as f:	
+	with open("../test/data/map_data/position_north.txt", "r") as f:	
 		position = f.readline().split(" ")	
 		print(position)
 		x = float(position[0])
 		y = float(position[1])
 		theta = float(position[2])
-	map_data = np.loadtxt("../test/data/map_data/map_data_1.txt", dtype=np.uint8, delimiter=' ')
+	map_data = np.loadtxt("../test/data/map_data/map_data_north.txt", dtype=np.uint8, delimiter=' ')
 	#map_data = np.random.random_integers(0, 255, (500, 500))
 	print(map_data.shape)
 	drone_vehicle.parseMapData(x, y, theta, map_data)
