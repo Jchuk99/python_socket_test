@@ -132,7 +132,7 @@ class DroneVehicle:
 		newX = (-math.cos(math.radians(theta)))*2
 		newY = (-math.sin(math.radians(theta)))*2
 		
-		self.setV(newY, newX, 0)
+		#self.setV(newY, newX, 0)
 	
 	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
 		x_orig = x_max - r
