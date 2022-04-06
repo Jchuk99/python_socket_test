@@ -145,10 +145,10 @@ class DroneVehicle:
 			
 			#create new velocities
 			if abs(x) > abs(y):
-				newX = 1						
+				newX = 0.25						
 				newY = newX*k
 			else:
-				newY = 1
+				newY = 0.25
 				newX = newY*k
 			
 			#set correct sign
@@ -159,7 +159,8 @@ class DroneVehicle:
 				newY = newY*(-1)
 			
 			#set velocity
-			self.setV(newY,newX,0)
+			#self.setV(newY,newX,0)
+			print("\nvelociy is:" + str(newY)+ ", " + str(newX))
 			
 		def returnToBase(self):
 			self.vehicle.mode = VehicleMode("RTL")
