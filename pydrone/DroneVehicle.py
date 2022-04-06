@@ -123,18 +123,61 @@ class DroneVehicle:
 		
 		#self.setV(newY, newX, 0)
 	
-	def foundObj(self, x,y,theta):
+	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
+		x_orig = x_max - r
+		y_orig = y_max - r
+		
+		#negative
+		if theta < 0:
+			theta = theta*-1
+			#mod and convert to positive
+			theta = theta%360
+			theta = 360-theta
+		#positive
+		else :
+			#mod
+			theta = theta%360
+		
+		#east
+		if theta <= 45 or theta >= 315:
+			y = s_y - (2*y_orig)
+			x = x_y
+		#north
+		elif theta <= 135:
+			y = s_y
+			x = s_x
+		#west
+		elif theta <= 225:
+			y = s_y
+			x = s_x - (2*x_orig)
+		#south
+		else:
+			y = s_y - (2*y_orig)
+			x = s_x - (2*x_orig)
+		
 		#checks edge cases
 		if x==0:
 			if y>0:
-				self.setV(-1,0,0)
+				#self.setV(-0.25,0,0)
+				#time.sleep(1)
+				#self.stopMov()
+				print("\nvelociy is:" + str(-0.25)+ ", " + str(0))
 			elif y<0:
-				self.setV(1,0,0)
+				#self.setV(0.25,0,0)
+				#time.sleep(1)
+				#self.stopMov()
+				print("\nvelociy is:" + str(0.25)+ ", " + str(0))
 		elif y==0:
 			if x>0:
-				self.setV(0,-1,0)
+				#self.setV(0,-0.25,0)
+				#time.sleep(1)
+				#self.stopMov()
+				print("\nvelociy is:" + str(0)+ ", " + str(newX))
 			elif x<0:
-				self.setV(0,1,0)
+				#self.setV(0,0.25,0)
+				#time.sleep(1)
+				#self.stopMov()
+				print("\nvelociy is:" + str(0)+ ", " + str(newX))
 		#take constant ratio and reduce
 		elif y!=0 and x!=0:			
 			if abs(x) > abs(y):
@@ -147,10 +190,10 @@ class DroneVehicle:
 			
 			#create new velocities
 			if abs(x) > abs(y):
-				newX = 0.25						
+				newX = 0.35						
 				newY = newX*k
 			else:
-				newY = 0.25
+				newY = 0.35
 				newX = newY*k
 			
 			#set correct sign
@@ -162,6 +205,8 @@ class DroneVehicle:
 			
 			#set velocity
 			#self.setV(newY,newX,0)
+			#time.sleep(1)
+			#self.stopMov()
 			print("\nvelociy is:" + str(newY)+ ", " + str(newX))
 			
 		def returnToBase(self):
