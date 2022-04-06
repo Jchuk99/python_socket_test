@@ -209,18 +209,25 @@ class DroneVehicle:
 			y_max = s
 		
 		#iterators
-		i = x_min
-		j = y_min
+		i = int(x_min)
+		j = int(y_min)
+
+		print("i: ")
 		
 		#check range of pixels
 		while(j < y_max):
+			i = int(x_min)
 			while (i < x_max):
-				if data[i,j] < 128:
+				if data[i, j] < 128:
 					self.foundObj(i,j,theta,x_max,y_max,ran)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
 					break
+				i = i + 1
+
+			j = j + 1
+				
 
 
 if __name__ == "__main__":
