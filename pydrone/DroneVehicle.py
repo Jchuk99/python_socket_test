@@ -11,7 +11,7 @@ from time import sleep
 
 import socket
 import argparse
-
+import math
 
 # responsible for running code that moves the vehicle
 class DroneVehicle:
@@ -121,7 +121,7 @@ class DroneVehicle:
 		newX = (-math.cos(math.radians(theta)))*2
 		newY = (-math.sin(math.radians(theta)))*2
 		
-		self.setV(newY, newX, 0)
+		#self.setV(newY, newX, 0)
 	
 	def foundObj(self, x,y,theta):
 		#checks edge cases
@@ -215,8 +215,8 @@ class DroneVehicle:
 		#check range of pixels
 		while(j < y_max):
 			while (i < x_max):
-				if data[i,j] > 127:
-					foundObj(i,j,theta)
+				if data[i,j] < 128:
+					self.foundObj(i,j,theta,x_max,y_max,ran)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
