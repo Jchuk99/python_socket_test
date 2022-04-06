@@ -138,16 +138,16 @@ class DroneVehicle:
 		
 		#east
 		if theta <= 45 or theta >= 315:
-			y = s_y
-			x = x_y - (2*x_orig)
+			y = s_y - (2*y_orig)
+			x = x_y
 		#north
 		elif theta <= 135:
 			y = s_y
 			x = s_x
 		#west
 		elif theta <= 225:
-			y = s_y - (2*y_orig)
-			x = s_x
+			y = s_y
+			x = s_x - (2*x_orig)
 		#south
 		else:
 			y = s_y - (2*y_orig)
