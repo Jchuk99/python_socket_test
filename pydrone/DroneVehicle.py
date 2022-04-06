@@ -5,6 +5,7 @@ sys.path.append(".")
 import utils
 from pymavlink import mavutil
 import threading
+import numpy as np
 import time
 from time import sleep
 
@@ -15,7 +16,7 @@ import argparse
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, drone_map = None):
+	def __init__(self, drone_map = None, connect = True):
 		#connect to flight controller
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
 		self.drone_map = drone_map
@@ -27,7 +28,8 @@ class DroneVehicle:
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
 
-		self.vehicle = connect('udp:127.0.0.1:14550', wait_ready=True)
+		if connect:
+			self.vehicle = connect('udp:127.0.0.1:14550', wait_ready=True)
 		#self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
@@ -47,19 +49,6 @@ class DroneVehicle:
 
 
 	def run(self):
-		msg = vehicle.message_factory.command_long_encode(
-				0, 0,    # target system, target component
-				mavutil.mavlink.MAV_CMD_DO_SET_HOME, #command
-				0,    #confirmation
-				0,    # param 1, (1=use current location, 0=use specified location)
-				0,    # param 2, unused
-				0,    # param 3,unused
-				0,    # param 4, unused
-				40.4431693, -79.9549045, 0) # param 5 ~ 7 latitude, longitude, altitude
-        
-        self.vehicle.send_mavlink(msg)
-		self.vehicle.flush()
-        
 		self.vehicle_thread = threading.Thread(target=self.start, args=(1,))
 		self.vehicle_thread.start()
 
@@ -121,7 +110,7 @@ class DroneVehicle:
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
 		
-	def foundObjT(self,y,y,theta):
+	def foundObjT(self,x,y,theta):
 		#fix theta
 		if theta > 360:
 			while theta > 360:
@@ -134,61 +123,18 @@ class DroneVehicle:
 		
 		self.setV(newY, newX, 0)
 	
-	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
-		x_orig = x_max - r
-		y_orig = y_max - r
-		
-		#negative
-		if theta < 0:
-			theta = theta*-1
-			#mod and convert to positive
-			theta = theta%360
-			theta = 360-theta
-		#positive
-		else :
-			#mod
-			theta = theta%360
-		
-		#east
-		if theta <= 45 or theta >= 315:
-			y = s_y - (2*y_orig)
-			x = x_y
-		#north
-		elif theta <= 135:
-			y = s_y
-			x = s_x
-		#west
-		elif theta <= 225:
-			y = s_y
-			x = s_x - (2*x_orig)
-		#south
-		else:
-			y = s_y - (2*y_orig)
-			x = s_x - (2*x_orig)
-		
+	def foundObj(self, x,y,theta):
 		#checks edge cases
 		if x==0:
 			if y>0:
-				#self.setV(-0.25,0,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(-0.25)+ ", " + str(0))
+				self.setV(-1,0,0)
 			elif y<0:
-				#self.setV(0.25,0,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0.25)+ ", " + str(0))
+				self.setV(1,0,0)
 		elif y==0:
 			if x>0:
-				#self.setV(0,-0.25,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0)+ ", " + str(newX))
+				self.setV(0,-1,0)
 			elif x<0:
-				#self.setV(0,0.25,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0)+ ", " + str(newX))
+				self.setV(0,1,0)
 		#take constant ratio and reduce
 		elif y!=0 and x!=0:			
 			if abs(x) > abs(y):
@@ -201,10 +147,10 @@ class DroneVehicle:
 			
 			#create new velocities
 			if abs(x) > abs(y):
-				newX = 0.35						
+				newX = 0.25						
 				newY = newX*k
 			else:
-				newY = 0.35
+				newY = 0.25
 				newX = newY*k
 			
 			#set correct sign
@@ -216,18 +162,16 @@ class DroneVehicle:
 			
 			#set velocity
 			#self.setV(newY,newX,0)
-			#time.sleep(1)
-			#self.stopMov()
 			print("\nvelociy is:" + str(newY)+ ", " + str(newX))
 			
-	def returnToBase(self):
-		self.vehicle.mode = VehicleMode("RTL")
+		def returnToBase(self):
+			self.vehicle.mode = VehicleMode("RTL")
 		
-	def stopMov(self):
-		self.setV(0,0,0)
+		def stopMov(self):
+			self.setV(0,0,0)
 			
-	def land(self):
-		self.vehicle.mode = VehicleMode("LAND")
+		def land(self):
+			self.vehicle.mode = VehicleMode("LAND")
 	
 	def parseMapData(self,x_old,y_old,theta,data):
 		#mm -> m
@@ -271,8 +215,8 @@ class DroneVehicle:
 		#check range of pixels
 		while(j < y_max):
 			while (i < x_max):
-				if data[i,j] == 1:
-					foundObj(i,j,theta,x_max,y_max,ran)
+				if data[i,j] > 127:
+					foundObj(i,j,theta)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
@@ -281,15 +225,22 @@ class DroneVehicle:
 
 if __name__ == "__main__":
 	map_data = None
-	x, y, theta = None
-	drone_vehicle = DroneVehicle(drone_map)
-    with open("../test/data/map_data/position.txt", "w") as file:
-        position = f.readline().split(" ")
-		x = position[0]
-		y = position[1]
-		theta = position[2]
-	map_data = numpy.loadtxt("../test/data/map_data/position.txt", dtype=uint8, delimeter=',')
-	parseMapData(x, y, theta, map_data)
+	x = None
+	y = None
+	theta = None
+	drone_vehicle = DroneVehicle(connect=False)
+	with open("../test/data/map_data/position_1.txt", "r") as f:	
+		position = f.readline().split(" ")	
+		print(position)
+		x = float(position[0])
+		y = float(position[1])
+		theta = float(position[2])
+	#map_data = np.loadtxt("../test/data/map_data/map_data_1.txt", dtype=np.uint8, delimiter=' ')
+	map_data = np.random.random_integers(0, 255, (500, 500))
+	print(map_data.shape)
+	drone_vehicle.parseMapData(x, y, theta, map_data)
+
+
 
 
 
