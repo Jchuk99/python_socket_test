@@ -271,7 +271,7 @@ class DroneVehicle:
 		#check range of pixels
 		while(j < y_max):
 			while (i < x_max):
-				if data[i,j] == 1:
+				if data[i,j] < 128:
 					foundObj(i,j,theta,x_max,y_max,ran)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
@@ -283,8 +283,8 @@ if __name__ == "__main__":
 	map_data = None
 	x, y, theta = None
 	drone_vehicle = DroneVehicle(drone_map)
-    with open("../test/data/map_data/position.txt", "w") as file:
-        position = f.readline().split(" ")
+	with open("../test/data/map_data/position.txt", "w") as file:
+		position = f.readline().split(" ")
 		x = position[0]
 		y = position[1]
 		theta = position[2]
