@@ -121,18 +121,53 @@ class DroneVehicle:
 		
 		self.setV(newY, newX, 0)
 	
-	def foundObj(self, x,y,theta):
+	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
+		x_orig = x_max - r
+		y_orig = y_max - r
+		
+		#negative
+		if theta < 0:
+			theta = theta*-1
+			#mod and convert to positive
+			theta = theta%360
+			theta = 360-theta
+		#positive
+		else :
+			#mod
+			theta = theta%360
+		
+		#east
+		if theta <= 45 or theta >= 315:
+			y = s_y
+			x = x_y - (2*x_orig)
+		#north
+		elif theta <= 135:
+			y = s_y
+			x = s_x
+		#west
+		elif theta <= 225:
+			y = s_y - (2*y_orig)
+			x = s_x
+		#south
+		else:
+			y = s_y - (2*y_orig)
+			x = s_x - (2*x_orig)
+		
 		#checks edge cases
 		if x==0:
 			if y>0:
-				self.setV(-1,0,0)
+				#self.setV(-0.25,0,0)
+				print("\nvelociy is:" + str(-0.25)+ ", " + str(0))
 			elif y<0:
-				self.setV(1,0,0)
+				#self.setV(0.25,0,0)
+				print("\nvelociy is:" + str(0.25)+ ", " + str(0))
 		elif y==0:
 			if x>0:
-				self.setV(0,-1,0)
+				#self.setV(0,-0.25,0)
+				print("\nvelociy is:" + str(0)+ ", " + str(newX))
 			elif x<0:
-				self.setV(0,1,0)
+				#self.setV(0,0.25,0)
+				print("\nvelociy is:" + str(0)+ ", " + str(newX))
 		#take constant ratio and reduce
 		elif y!=0 and x!=0:			
 			if abs(x) > abs(y):
@@ -213,8 +248,8 @@ class DroneVehicle:
 		#check range of pixels
 		while(j < y_max):
 			while (i < x_max):
-				if data[i,j] > 127:
-					foundObj(i,j,theta)
+				if data[i,j] == 1:
+					foundObj(i,j,theta,x_max,y_max,ran)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
