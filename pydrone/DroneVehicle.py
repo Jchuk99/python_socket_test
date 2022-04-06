@@ -141,7 +141,7 @@ class DroneVehicle:
 		#east
 		if theta <= 45 or theta >= 315:
 			y = s_y - (2*y_orig)
-			x = x_y
+			x = s_x
 		#north
 		elif theta <= 135:
 			y = s_y
@@ -287,8 +287,8 @@ if __name__ == "__main__":
 		x = float(position[0])
 		y = float(position[1])
 		theta = float(position[2])
-	#map_data = np.loadtxt("../test/data/map_data/map_data_1.txt", dtype=np.uint8, delimiter=' ')
-	map_data = np.random.random_integers(0, 255, (500, 500))
+	map_data = np.loadtxt("../test/data/map_data/map_data_1.txt", dtype=np.uint8, delimiter=' ')
+	#map_data = np.random.random_integers(0, 255, (500, 500))
 	print(map_data.shape)
 	drone_vehicle.parseMapData(x, y, theta, map_data)
 
