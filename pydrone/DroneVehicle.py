@@ -10,7 +10,7 @@ from time import sleep
 
 import socket
 import argparse
-
+import math
 
 # responsible for running code that moves the vehicle
 class DroneVehicle:
@@ -272,7 +272,7 @@ class DroneVehicle:
 		while(j < y_max):
 			while (i < x_max):
 				if data[i,j] < 128:
-					foundObj(i,j,theta,x_max,y_max,ran)
+					self.foundObj(i,j,theta,x_max,y_max,ran)
 					time.sleep(5)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
