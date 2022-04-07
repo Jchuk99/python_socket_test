@@ -4,8 +4,10 @@ import sys
 sys.path.append(".")
 import utils
 from pymavlink import mavutil
+import matplotlib.pyplot as plt
 import threading
 import numpy as np
+import os
 import time
 from time import sleep
 
@@ -110,19 +112,6 @@ class DroneVehicle:
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
 		
-	def foundObjT(self,x,y,theta):
-		#fix theta
-		if theta > 360:
-			while theta > 360:
-				theta = theta-360
-		elif theta < 0:
-			theta = theta*-1
-			
-		newX = (-math.cos(math.radians(theta)))*2
-		newY = (-math.sin(math.radians(theta)))*2
-		
-		#self.setV(newY, newX, 0)
-	
 	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
 		x_orig = x_max - r
 		y_orig = y_max - r
@@ -131,12 +120,12 @@ class DroneVehicle:
 		if theta < 0:
 			theta = theta*-1
 			#mod and convert to positive
-			theta = theta%360
-			theta = 360-theta
+			theta = theta % 360
+			theta = 360 - theta
 		#positive
 		else :
 			#mod
-			theta = theta%360
+			theta = theta % 360
 		
 		#east
 		if theta <= 45 or theta >= 315:
@@ -231,7 +220,7 @@ class DroneVehicle:
 		#max range
 		s = math.sqrt(data.size)
 		#radius in meters
-		rad = .5
+		rad = .75
 		#m -> pixels
 		ran = rad/.02
 		
@@ -271,11 +260,10 @@ class DroneVehicle:
 				if data[i, j] == 1:
 					print(data[i,j])
 					print("\ni: " + str(i) + "\nj: " + str(j))
-					self.foundObj(i,j,theta,x_max,y_max,ran)
-					time.sleep(5)
+					self.foundObj(i, j,theta,x_max,y_max,ran)
+					time.sleep(.1)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
-					break
 				i = i + 1
 
 			j = j + 1
@@ -290,15 +278,16 @@ if __name__ == "__main__":
 	y = None
 	theta = None
 	drone_vehicle = DroneVehicle(connect=False)
-	with open("../test/data/map_data/position_north.txt", "r") as f:	
+	print(os.getcwd())
+	with open("test/data/map_data/position_north.txt", "r") as f:	
 		position = f.readline().split(" ")	
 		print(position)
 		x = float(position[0])
 		y = float(position[1])
 		theta = float(position[2])
-	map_data = np.loadtxt("../test/data/map_data/map_data_north.txt", dtype=np.uint8, delimiter=' ')
-	#map_data = np.random.random_integers(0, 255, (500, 500))
-	print(map_data.shape)
+	map_data = np.loadtxt("test/data/map_data/map_data_north.txt", dtype=np.uint8, delimiter=' ')
+	plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
+	plt.show()
 	drone_vehicle.parseMapData(x, y, theta, map_data)
 
 
