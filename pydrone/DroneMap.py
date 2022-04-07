@@ -7,9 +7,9 @@ LIDAR_DEVICE            = '/dev/ttyUSB0'
 # at that rate.
 MIN_SAMPLES   = 200
 
-from breezyslam.algorithms import RMHC_SLAM
-from breezyslam.sensors import RPLidarA1 as LaserModel
-from scipy.interpolate import interp1d
+#from breezyslam.algorithms import RMHC_SLAM
+#from breezyslam.sensors import RPLidarA1 as LaserModel
+#from scipy.interpolate import interp1d
 
 
 import sys
@@ -26,14 +26,16 @@ import time
 
 
 class DroneMap:
-    def __init__(self):
+    def __init__(self, run = True):
+        self.running = run
         # lidar stuff
         try:
-            self.lidar = PyLidar(LIDAR_DEVICE, 115200)
-            # connects the lidar using the default port (tty/USB0)
-            self.lidar.connect()
-            # Starts the lidar motor
-            self.lidar.start_motor()
+            if self.running:
+                self.lidar = PyLidar(LIDAR_DEVICE, 115200)
+                # connects the lidar using the default port (tty/USB0)
+                self.lidar.connect()
+                # Starts the lidar motor
+                self.lidar.start_motor()
         except OSError:
             print("Lidar is not properly connected.")
             sys.exit()
@@ -108,10 +110,11 @@ class DroneMap:
         pass
 
     def run(self):
-        self.lidar_thread = threading.Thread(target = self.read_lidar_data)
-        self.map_thread = threading.Thread(target = self.update_map)
-        self.lidar_thread.start()
-        self.map_thread.start()
+        if self.running:
+            self.lidar_thread = threading.Thread(target = self.read_lidar_data)
+            self.map_thread = threading.Thread(target = self.update_map)
+            self.lidar_thread.start()
+            self.map_thread.start()
 
     def stop(self):
         print('stopping lidar')

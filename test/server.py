@@ -1,6 +1,7 @@
 import sys
 sys.path.append(r"../pydrone")
 sys.path.append(r"../pydrone/clients")
+import argparse
 import utils
 from DroneVehicle import DroneVehicle
 from DroneServer import DroneServer
@@ -9,25 +10,26 @@ from queue import Queue
 from time import sleep
 
 
-def main():
+def main(args):
 
-    drone_map = DroneMap()  # thread-safe map object
+    print(args)
+    drone_map = DroneMap(run=args.no_lidar)  # thread-safe map object
     message_queue = Queue()  # thread-safe message queue class 
 
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
  
-    drone_vehicle = DroneVehicle(drone_map)
-    drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"192.168.1.111", 5050)
+    drone_vehicle = DroneVehicle(drone_map, connect = args.no_connect_drone)
+    drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"172.18.160.1", 5050)
     #drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
-    
+
     drone_map.run()
     drone_server.run()
     while True:
         if not message_queue.empty():
             message = message_queue.get()
             if message == 'START':
-                # AKA we start a new thread to get the drone to hover, and run obstacle avoidance
+                # AKA we start a new thread to get the drone to hov`er, and run obstacle avoidance
                 # give this thread: 
                 # drone_map to run obstacle avoidance using provided info,
                 print('drone is starting')
@@ -49,4 +51,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument( '--no_lidar', default = True, action='store_false')
+    parser.add_argument( '--no_connect_drone', default = True, action='store_false')
+    args = parser.parse_args()
+    main(args)
