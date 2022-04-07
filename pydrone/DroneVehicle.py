@@ -274,11 +274,16 @@ class DroneVehicle:
 		i = int(x_min)
 		j = int(y_min)
 		
+
+
+		sum_dx = 0
+		sum_dy = 0
+
 		#print(x_max)
 		#print(x_min)
 		#print(y_max)
-		#rint(y_min)
-		z = 0
+		#print(y_min)
+		
 		#check range of pixels
 		while(j < y_max):
 			i = int(x_min)
@@ -289,13 +294,12 @@ class DroneVehicle:
 					print("\ny: " + str(i) + " x: " + str(j))
 					self.foundObj(j,i,theta,x,y,ran)
 					time.sleep(.1)
-					#revisit this to solve for drone returning to base only after object is gone
-					#current idea, just let loop run and see what happens
+					#sum_dx = sum_dx + (j-x)
+					#sum_dy = sum_dy + (y-i)
+					
 				i = i + 1
 
 			j = j + 1
-			z = z+1
-		print(z)
 				
 
 
