@@ -112,10 +112,25 @@ class DroneVehicle:
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
 		
-	def foundObj(self,s_x,s_y,theta,x_max,y_max,r):
-		x_orig = x_max - r
-		y_orig = y_max - r
-		
+	def foundObj(self,s_x,s_y,theta,x_orig,y_orig,r):
+  		#find quad
+		dx = s_x - x_orig
+		dy = y_orig - s_y
+
+		print("dy: "+ str(dy)+" dx: "+str(dx)+"\ns_x: "+str(s_x)+" x_orig: "+str(x_orig)+"\ns_y: "+str(s_y)+" y_orig: "+str(y_orig))
+
+		#TODO add edge cases
+		#if(s_x == x_orig):
+    			
+		if(dx > 0 and dy > 0):
+			quad = 1
+		elif(dx < 0 and dy > 0):
+			quad = 2
+		elif(dx < 0 and dy < 0):
+			quad = 3
+		else:
+			quad = 4
+
 		#negative
 		if theta < 0:
 			theta = theta*-1
@@ -127,85 +142,96 @@ class DroneVehicle:
 			#mod
 			theta = theta % 360
 		
+		#set bool for whether x and or y should be flipped based on quad and where the drone is facing
 		#east
 		if theta <= 45 or theta >= 315:
-			y = s_y - (2*y_orig)
-			x = s_x
+			print("east")
+			if(quad == 2 or quad == 4):
+				print("quad 2 or 4")
+				fx = 1
+				fy = 0
+			else:
+				print("quad 1 or 3")
+				fx = 0
+				fy = 1
 		#north
 		elif theta <= 135:
-			y = s_y
-			x = s_x
+			fx = 0
+			fy = 0
 		#west
 		elif theta <= 225:
-			y = s_y
-			x = s_x - (2*x_orig)
+			if(quad == 2 or quad == 4):
+				fx = 0
+				fy = 1
+			else:
+				fx = 1
+				fy = 0
 		#south
 		else:
-			y = s_y - (2*y_orig)
-			x = s_x - (2*x_orig)
+			fx = 0
+			fy = 0
 		
-		#checks edge cases
-		if x==0:
-			if y>0:
-				#self.setV(-0.25,0,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(-0.25)+ ", " + str(0))
-			elif y<0:
-				#self.setV(0.25,0,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0.25)+ ", " + str(0))
-		elif y==0:
-			if x>0:
-				#self.setV(0,-0.25,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0)+ ", " + str(newX))
-			elif x<0:
-				#self.setV(0,0.25,0)
-				#time.sleep(1)
-				#self.stopMov()
-				print("\nvelociy is:" + str(0)+ ", " + str(newX))
+		
+		#find angles between points
+		angle = math.degrees(math.atan(dy/dx))
+		
+		#larger value set to 0.35
+		if(dy > dx):
+			vy = 0.35
+			vx = vy/math.tan(angle+180)
+		else:
+			vx = 0.35
+			vy = vx/math.tan(angle+180)
+		
+		if(fx):
+			print("flip x")
+			vx = vx*-1
+		
+		if(fy):
+			print("flip y")
+			vy = vy*-1
+
+		##################################################################
 		#take constant ratio and reduce
-		elif y!=0 and x!=0:			
-			if abs(x) > abs(y):
-				k = y/x
-			else:
-				k = x/y
+		#if y!=0 and x!=0:			
+			#if abs(x) > abs(y):
+				#k = y/x
+			#else:
+				#k = x/y
 			
-			if k < 0:
-				k = k*(-1)
+			#if k < 0:
+				#k = k*(-1)
 			
 			#create new velocities
-			if abs(x) > abs(y):
-				newX = 0.35						
-				newY = newX*k
-			else:
-				newY = 0.35
-				newX = newY*k
+			#if abs(x) > abs(y):
+				#newX = 0.35						
+				#newY = newX*k
+			#else:
+				#newY = 0.35
+				#newX = newY*k
 			
 			#set correct sign
-			if x > 0:
-				newX = newX*(-1)
+			#if x > 0:
+				#newX = newX*(-1)
 			
-			if y > 0:
-				newY = newY*(-1)
+			#if y > 0:
+				#newY = newY*(-1)
 			
-			#set velocity
-			#self.setV(newY,newX,0)
-			#time.sleep(1)
-			#self.stopMov()
-			print("\nvelociy is:" + str(newY)+ ", " + str(newX))
+		#############################################################
+		#set velocity
+		#self.setV(vy,vx,0)
+		#time.sleep(1)
+		#self.stopMov()
+		print("\nvelociy is:" + str(vy)+ ", " + str(vx))
 			
-		def returnToBase(self):
-			self.vehicle.mode = VehicleMode("RTL")
+	def returnToBase(self):
+		self.vehicle.mode = VehicleMode("RTL")
+	
+	def stopMov(self):
+		self.setV(0,0,0)
 		
-		def stopMov(self):
-			self.setV(0,0,0)
-			
-		def land(self):
-			self.vehicle.mode = VehicleMode("LAND")
+	def land(self):
+		self.vehicle.mode = VehicleMode("LAND")
 	
 	def parseMapData(self,x_old,y_old,theta,data):
 		#mm -> m
@@ -215,7 +241,10 @@ class DroneVehicle:
 		#m => pixels
 		x = x/0.02
 		y = y/0.02
-		
+
+		x = int(x)
+		y = int(y)
+
 		print("x :" + str(x) + "\ny: " + str(y))
 		#max range
 		s = math.sqrt(data.size)
@@ -247,10 +276,10 @@ class DroneVehicle:
 		i = int(x_min)
 		j = int(y_min)
 		
-		print(x_max)
-		print(x_min)
-		print(y_max)
-		print(y_min)
+		#print(x_max)
+		#print(x_min)
+		#print(y_max)
+		#rint(y_min)
 		z = 0
 		#check range of pixels
 		while(j < y_max):
@@ -259,8 +288,8 @@ class DroneVehicle:
 				#print(data[i, j])
 				if data[i, j] == 1:
 					print(data[i,j])
-					print("\ni: " + str(i) + "\nj: " + str(j))
-					self.foundObj(i, j,theta,x_max,y_max,ran)
+					print("\ny: " + str(i) + " x: " + str(j))
+					self.foundObj(i, j,theta,x,y,ran)
 					time.sleep(.1)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
