@@ -131,6 +131,7 @@ class DroneVehicle:
 		else:
 			quad = 4
 
+		print(quad)
 		#negative
 		if theta < 0:
 			theta = theta*-1
@@ -144,52 +145,49 @@ class DroneVehicle:
 		
 		#set bool for whether x and or y should be flipped based on quad and where the drone is facing
 		#east
-		if theta <= 45 or theta >= 315:
-			print("east")
-			if(quad == 2 or quad == 4):
-				print("quad 2 or 4")
-				fx = 1
-				fy = 0
-			else:
-				print("quad 1 or 3")
-				fx = 0
-				fy = 1
-		#north
-		elif theta <= 135:
-			fx = 0
-			fy = 0
-		#west
-		elif theta <= 225:
-			if(quad == 2 or quad == 4):
-				fx = 0
-				fy = 1
-			else:
-				fx = 1
-				fy = 0
-		#south
-		else:
-			fx = 0
-			fy = 0
+		# if theta <= 45 or theta >= 315:
+		# 	print("east")
+		# 	if(quad == 2 or quad == 4):
+		# 		fx = 1
+		# 		fy = 0
+		# 	else:
+		# 		fx = 0
+		# 		fy = 1
+		# #north
+		# elif theta <= 135:
+		# 	fx = 0
+		# 	fy = 0
+		# #west
+		# elif theta <= 225:
+		# 	if(quad == 2 or quad == 4):
+		# 		fx = 0
+		# 		fy = 1
+		# 	else:
+		# 		fx = 1
+		# 		fy = 0
+		# #south
+		# else:
+		# 	fx = 1
+		# 	fy = 1
 		
 		
 		#find angles between points
-		angle = math.degrees(math.atan(dy/dx))
+		#angle = math.degrees(math.atan(dy/dx))
+		hyp = math.sqrt((dx*dx)+(dy*dy))
+
+		red = 0.35
+
+		vx = (-dx/hyp)*red
+		vy = (-dy/hyp)*red
+
 		
-		#larger value set to 0.35
-		if(dy > dx):
-			vy = 0.35
-			vx = vy/math.tan(angle+180)
-		else:
-			vx = 0.35
-			vy = vx/math.tan(angle+180)
+		# if(fx):
+    	# 		print("flip x")
+		# 	vx = vx*-1
 		
-		if(fx):
-			print("flip x")
-			vx = vx*-1
-		
-		if(fy):
-			print("flip y")
-			vy = vy*-1
+		# if(fy):
+		# 	print("flip y")
+		# 	vy = vy*-1
 
 		##################################################################
 		#take constant ratio and reduce
@@ -289,7 +287,7 @@ class DroneVehicle:
 				if data[i, j] == 1:
 					print(data[i,j])
 					print("\ny: " + str(i) + " x: " + str(j))
-					self.foundObj(i, j,theta,x,y,ran)
+					self.foundObj(j,i,theta,x,y,ran)
 					time.sleep(.1)
 					#revisit this to solve for drone returning to base only after object is gone
 					#current idea, just let loop run and see what happens
