@@ -51,7 +51,7 @@ class DroneVehicle:
 
 
 	def run(self):
-		self.vehicle_thread = threading.Thread(target=self.start, args=(1,))
+		self.vehicle_thread = threading.Thread(target=self.start, args=(.75,))
 		self.vehicle_thread.start()
 
 	def start(self, targetAlt):
@@ -72,7 +72,7 @@ class DroneVehicle:
 
 		print(f'vehicle.mode: {self.vehicle.mode}')
 		print("Taking off!")
-		self.vehicle.simple_takeoff(1) # Take off to target altitude
+		self.vehicle.simple_takeoff(.75) # Take off to target altitude
 
 		# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
 		#  after Vehicle.simple_takeoff will execute immediately).
