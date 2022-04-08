@@ -16,6 +16,7 @@ import sys
 
 from breezyslam.algorithms import RMHC_SLAM
 from breezyslam.sensors import RPLidarA1 as LaserModel
+from scipy.interpolate import interp1d
 
 sys.path.append(".")
 from PyLidar import PyLidar
