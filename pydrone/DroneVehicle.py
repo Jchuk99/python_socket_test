@@ -88,9 +88,7 @@ class DroneVehicle:
 		while self.running:
 			self.vehicle.mode = VehicleMode("LAND")
 			# obstacle detection goes here
-			
-			
-			parseMapData(self.drone_map.map.x,self.drone_map.map.y,self.drone_map.map.theta,self.drone_map.map.get_map_as_np())
+			#self.parseMapData(self.drone_map.map.x,self.drone_map.map.y,self.drone_map.map.theta,self.drone_map.map.get_map_as_np())
 	
 	
 	
@@ -113,7 +111,7 @@ class DroneVehicle:
 		self.vehicle.flush()
 		
 	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
-
+    
 
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
