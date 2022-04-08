@@ -83,7 +83,7 @@ class DroneVehicle:
 			if self.vehicle.location.global_relative_frame.alt>=targetAlt*0.95:
 				print("Reached target altitude")
 				break
-			time.sleep(1)
+			time.sleep(15)
 
 		print("attempting to land")
 		while self.running:

@@ -18,6 +18,9 @@ def main(args):
 
     # drone server will pass command through message queue, and 
     # will give map/telemetry data through map and telemetry data structures
+    
+    if args.no_gui:
+        message_queue.put('START')
  
     drone_vehicle = DroneVehicle(drone_map, connected = args.no_connect_drone)
     drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"172.20.10.5", 5050)
@@ -26,8 +29,7 @@ def main(args):
     drone_map.run()
     drone_server.run()
 
-    if args.no_gui:
-        message_queue.put('START')
+
     
     while True:
         if not message_queue.empty():
