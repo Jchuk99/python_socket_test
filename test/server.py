@@ -20,7 +20,7 @@ def main(args):
     # will give map/telemetry data through map and telemetry data structures
  
     drone_vehicle = DroneVehicle(drone_map, connect = args.no_connect_drone)
-    drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"172.18.160.1", 5050)
+    drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"172.20.10.5", 5050)
     #drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
 
     drone_map.run()
