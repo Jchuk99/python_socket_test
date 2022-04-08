@@ -18,9 +18,10 @@ import math
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, drone_map = None, connect = True):
+	def __init__(self, drone_map = None, connected = True):
 		#connect to flight controller
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
+		self.connected = connected
 		self.drone_map = drone_map
 		self.isRunning = utils.LockedObject()
 		self.isRunning = False
@@ -30,7 +31,7 @@ class DroneVehicle:
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
 
-		if connect:
+		if self.connected:
 			self.vehicle = connect('udp:127.0.0.1:14550', wait_ready=True)
 		#self.vehicle = connect(self.addr, wait_ready=True)
 		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
