@@ -13,6 +13,9 @@ MIN_SAMPLES   = 200
 
 
 import sys
+
+from pydrone.BreezySLAM.python.breezyslam.algorithms import RMHC_SLAM
+from pydrone.BreezySLAM.python.breezyslam.sensors import LaserModel
 sys.path.append(".")
 from PyLidar import PyLidar
 from utils import LockedObject
