@@ -57,16 +57,16 @@ class DroneMap:
     def read_lidar_data(self):
         while True:
             self.current_lidar_reading = self.lidar.get_lidar_scans_as_np(True)
-            sleep(.1)
+            sleep(.02)
   
     def update_map(self):
         self.slam = RMHC_SLAM(
             LaserModel(), 
             MAP_SIZE_PIXELS, 
             MAP_SIZE_METERS, 
-            map_quality=40, 
-            hole_width_mm=1000,
-            max_search_iter=4000
+            map_quality=60, 
+            hole_width_mm=600,
+            max_search_iter=4250
             )
 
         # We will use these to store previous scan in case current scan is inadequate
@@ -105,7 +105,7 @@ class DroneMap:
                 self.map = MapData(
                     items,mapbytes,x,y,theta
                 )
-            sleep(.01)
+            sleep(.02)
 
         pass
 

@@ -112,16 +112,12 @@ class DroneVehicle:
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
 		
-	def foundObj(self,s_x,s_y,theta,x_orig,y_orig,r):
-  		#find quad
-		dx = s_x - x_orig
-		dy = y_orig - s_y
+	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
 
-		print("dy: "+ str(dy)+" dx: "+str(dx)+"\ns_x: "+str(s_x)+" x_orig: "+str(x_orig)+"\ns_y: "+str(s_y)+" y_orig: "+str(y_orig))
 
-		#TODO add edge cases
-		#if(s_x == x_orig):
-    			
+		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
+
+
 		if(dx > 0 and dy > 0):
 			quad = 1
 		elif(dx < 0 and dy > 0):
@@ -143,34 +139,6 @@ class DroneVehicle:
 			#mod
 			theta = theta % 360
 		
-		#set bool for whether x and or y should be flipped based on quad and where the drone is facing
-		#east
-		# if theta <= 45 or theta >= 315:
-		# 	print("east")
-		# 	if(quad == 2 or quad == 4):
-		# 		fx = 1
-		# 		fy = 0
-		# 	else:
-		# 		fx = 0
-		# 		fy = 1
-		# #north
-		# elif theta <= 135:
-		# 	fx = 0
-		# 	fy = 0
-		# #west
-		# elif theta <= 225:
-		# 	if(quad == 2 or quad == 4):
-		# 		fx = 0
-		# 		fy = 1
-		# 	else:
-		# 		fx = 1
-		# 		fy = 0
-		# #south
-		# else:
-		# 	fx = 1
-		# 	fy = 1
-		
-		
 		#find angles between points
 		#angle = math.degrees(math.atan(dy/dx))
 		hyp = math.sqrt((dx*dx)+(dy*dy))
@@ -180,42 +148,6 @@ class DroneVehicle:
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
 
-		
-		# if(fx):
-    	# 		print("flip x")
-		# 	vx = vx*-1
-		
-		# if(fy):
-		# 	print("flip y")
-		# 	vy = vy*-1
-
-		##################################################################
-		#take constant ratio and reduce
-		#if y!=0 and x!=0:			
-			#if abs(x) > abs(y):
-				#k = y/x
-			#else:
-				#k = x/y
-			
-			#if k < 0:
-				#k = k*(-1)
-			
-			#create new velocities
-			#if abs(x) > abs(y):
-				#newX = 0.35						
-				#newY = newX*k
-			#else:
-				#newY = 0.35
-				#newX = newY*k
-			
-			#set correct sign
-			#if x > 0:
-				#newX = newX*(-1)
-			
-			#if y > 0:
-				#newY = newY*(-1)
-			
-		#############################################################
 		#set velocity
 		#self.setV(vy,vx,0)
 		#time.sleep(1)
@@ -231,17 +163,19 @@ class DroneVehicle:
 	def land(self):
 		self.vehicle.mode = VehicleMode("LAND")
 	
-	def parseMapData(self,x_old,y_old,theta,data):
+	def parseMapData(self,x_mm,y_mm,theta,data):
+		print("x_old :" + str(x_mm) + "\ny_old: " + str(y_mm))
 		#mm -> m
-		x = y_old/1000
-		y = x_old/1000
+		x = x_mm/1000
+		y = y_mm/1000
+		# flip, so x = y, y = x (for indexing into data)
 		
 		#m => pixels
 		x = x/0.02
 		y = y/0.02
 
-		x = int(x)
-		y = int(y)
+		x = round(x)
+		y = round(y)
 
 		print("x :" + str(x) + "\ny: " + str(y))
 		#max range
@@ -274,32 +208,21 @@ class DroneVehicle:
 		i = int(x_min)
 		j = int(y_min)
 		
-
-
 		sum_dx = 0
 		sum_dy = 0
 
-		#print(x_max)
-		#print(x_min)
-		#print(y_max)
-		#print(y_min)
-		
 		#check range of pixels
 		while(j < y_max):
 			i = int(x_min)
 			while (i < x_max):
-				#print(data[i, j])
-				if data[i, j] == 1:
-					print(data[i,j])
-					print("\ny: " + str(i) + " x: " + str(j))
-					self.foundObj(j,i,theta,x,y,ran)
-					time.sleep(.1)
-					#sum_dx = sum_dx + (j-x)
-					#sum_dy = sum_dy + (y-i)
-					
-				i = i + 1
-
-			j = j + 1
+				if data[j, i] == 1:
+					# i represents y here (rows), j represents x (cols)
+					print("x: " + str(i) + " y: " + str(j))
+					sum_dx = sum_dx + (i - x)
+					sum_dy = sum_dy + (y - j)	
+				i += 1
+			j += 1
+		self.foundObj(sum_dx, sum_dy, theta, x, y, rad)
 				
 
 
