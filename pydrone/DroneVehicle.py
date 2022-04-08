@@ -90,27 +90,28 @@ class DroneVehicle:
 			self.vehicle.mode = VehicleMode("LAND")
 			# obstacle detection goes here
 			#self.parseMapData(self.drone_map.map.x,self.drone_map.map.y,self.drone_map.map.theta,self.drone_map.map.get_map_as_np())
-		def testMov(self):
-			#north
-			self.setV(.35,0,0)
-			time.sleep(2)
-			self.stopMov()
-			time.sleep(2)
-			#south
-			self.setV(-.35,0,0)
-			time.sleep(2)
-			self.stopMov()
-			time.sleep(2)
-			#east
-			self.setV(0,.35,0)
-			time.sleep(2)
-			self.stopMov()
-			time.sleep(2)
-			#west
-			self.setV(0,-.35,0)
-			time.sleep(2)
-			self.stopMov()
-			time.sleep(2)
+		
+	def testMov(self):
+		#north
+		self.setV(.35,0,0)
+		time.sleep(2)
+		self.stopMov()
+		time.sleep(2)
+		#south
+		self.setV(-.35,0,0)
+		time.sleep(2)
+		self.stopMov()
+		time.sleep(2)
+		#east
+		self.setV(0,.35,0)
+		time.sleep(2)
+		self.stopMov()
+		time.sleep(2)
+		#west
+		self.setV(0,-.35,0)
+		time.sleep(2)
+		self.stopMov()
+		time.sleep(2)
 	
 	
 	def stop(self):
