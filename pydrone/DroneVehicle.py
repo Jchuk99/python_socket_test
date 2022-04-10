@@ -147,7 +147,6 @@ class DroneVehicle:
 		self.vehicle.flush()
 		
 	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
-    
 
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
@@ -176,6 +175,9 @@ class DroneVehicle:
 		#find angles between points
 		#angle = math.degrees(math.atan(dy/dx))
 		hyp = math.sqrt((dx*dx)+(dy*dy))
+		if hyp == 0:
+			print("\n no velocity is being sent")
+			return
 
 		red = 0.35
 
@@ -265,7 +267,7 @@ if __name__ == "__main__":
 	x = None
 	y = None
 	theta = None
-	drone_vehicle = DroneVehicle(connect=False)
+	drone_vehicle = DroneVehicle(connected=False)
 	print(os.getcwd())
 	with open("test/data/map_data/position_north.txt", "r") as f:	
 		position = f.readline().split(" ")	
