@@ -52,8 +52,22 @@ class DroneVehicle:
 
 
 	def run(self):
+		msg = self.vehicle.message_factory.command_long_encode(
+			0, 0,    # target system, target component
+			mavutil.mavlink.MAV_CMD_DO_SET_HOME, #command
+			0,    #confirmation
+			0,    # param 1, (1=use current location, 0=use specified location)
+			0,    # param 2, unused
+			0,    # param 3,unused
+			0,    # param 4, unused
+			40.4435249, -79.9547351, 0)    # param 5 ~ 7 latitude, longitude, altitude
+
+		self.vehicle.send_mavlink(msg)
+		self.vehicle.flush()
+
 		self.vehicle_thread = threading.Thread(target=self.start, args=(.75,))
 		self.vehicle_thread.start()
+
 
 	def start(self, targetAlt):
 
