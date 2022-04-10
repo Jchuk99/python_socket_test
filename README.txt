@@ -1,3 +1,16 @@
+# RUNNING SERVER/CLIENT GUI
+	1. Make sure GCS and flight computer are on same local network
+	2. activate the venv in python_socket_test on flight computer
+	3. navigate to test directory on flight computer and start the server by running:
+		- "sudo python3 server.py"
+		- comes with the options:
+			* --no_gui for running server without clientside gui commands
+			* --no_connect_drone, to prevent connecting to the flight controller
+			* --no_lidar, to prevent needing the lidar to run
+	4. activate venv in python_socket_test on GCS
+	5. after the server starts listening  navigate to test directory and run:
+		- python gui.py 
+
 # BUILDING TEST ENVIRONMENT FOR WINDOWS
 1. https://ardupilot.org/dev/docs/building-setup-windows-cygwin.html#building-setup-windows-cygwin
    Install Cygwin, follow this link for right setting and libraries to add.
@@ -22,12 +35,6 @@
 	./waf copter
 	will also need to install pexpect, empy, and future, you can do this at the cygwin installation.
 
-
-
-C:\Users\Udoka\.pyenv\pyenv-win\versions\3.8.10\include
-C:\Users\Udoka\.pyenv\pyenv-win\versions\3.8.10\libs
-python38.dll - 
-KERNEL32.dll - on sys path
 	
 
 # DOCKER DIRECTIONS
