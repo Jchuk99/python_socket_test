@@ -188,7 +188,7 @@ class DroneVehicle:
 		#self.setV(vy,vx,0)
 		#time.sleep(1)
 		#self.stopMov()
-		print("\nvelociy is:" + str(vy)+ ", " + str(vx))
+		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx)))
 			
 	def returnToBase(self):
 		self.vehicle.mode = VehicleMode("RTL")
@@ -256,7 +256,7 @@ class DroneVehicle:
 					print("x: " + str(i) + " y: " + str(j))
 					hyp = math.sqrt((j*j)+(i*i))
 					sum_dx = sum_dx + (i - x)/hyp
-					sum_dy = sum_dy + (y - j)/hyp	
+					sum_dy = sum_dy + (j - y)/hyp	
 				i += 1
 			j += 1
 		self.foundObj(sum_dx, sum_dy, theta, x, y, rad)
