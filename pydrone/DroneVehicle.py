@@ -254,8 +254,9 @@ class DroneVehicle:
 				if data[j, i] == 1:
 					# i represents y here (rows), j represents x (cols)
 					print("x: " + str(i) + " y: " + str(j))
-					sum_dx = sum_dx + (i - x)
-					sum_dy = sum_dy + (y - j)	
+					hyp = math.sqrt((j*j)+(i*i))
+					sum_dx = sum_dx + (i - x)/hyp
+					sum_dy = sum_dy + (y - j)/hyp	
 				i += 1
 			j += 1
 		self.foundObj(sum_dx, sum_dy, theta, x, y, rad)
