@@ -40,7 +40,7 @@ class DroneMap:
                 # connects the lidar using the default port (tty/USB0)
                 self.lidar.connect()
                 # Starts the lidar motor
-                self.lidar.start_motor()
+                self.lidar.stop_motor()
         except OSError:
             print("Lidar is not properly connected.")
             sys.exit()

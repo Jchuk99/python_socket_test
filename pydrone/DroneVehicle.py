@@ -179,8 +179,9 @@ class DroneVehicle:
 			print("\n no velocity is being sent")
 			return
 
-		red = 0.35
+		red = .35
 
+		print("vx before red : {}".format(-dx/hyp))
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
 
@@ -188,7 +189,16 @@ class DroneVehicle:
 		#self.setV(vy,vx,0)
 		#time.sleep(1)
 		#self.stopMov()
-		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx)))
+		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx, 2)))
+		if(vx < 0):
+			print('west')
+		elif(vx > 0):
+			print('east')
+
+		if(vy < 0):
+			print('south')
+		elif(vy > 0):
+			print('north')
 			
 	def returnToBase(self):
 		self.vehicle.mode = VehicleMode("RTL")
@@ -217,7 +227,7 @@ class DroneVehicle:
 		#max range
 		s = math.sqrt(data.size)
 		#radius in meters
-		rad = .75
+		rad = .70
 		#m -> pixels
 		ran = rad/.02
 		
@@ -240,12 +250,13 @@ class DroneVehicle:
 		if y_max > s:
 			y_max = s
 		
+		print("x_max:{} x_min: {}y_max: {} y_min: {}".format(x_max,x_min, y_max,y_min))
 		#iterators
 		i = int(x_min)
 		j = int(y_min)
 		
-		sum_dx = 0
-		sum_dy = 0
+		sum_dx = 0.0
+		sum_dy = 0.0
 
 		#check range of pixels
 		while(j < y_max):
@@ -253,12 +264,17 @@ class DroneVehicle:
 			while (i < x_max):
 				if data[j, i] == 1:
 					# i represents y here (rows), j represents x (cols)
-					print("x: " + str(i) + " y: " + str(j))
-					hyp = math.sqrt((j*j)+(i*i))
-					sum_dx = sum_dx + (i - x)/hyp
-					sum_dy = sum_dy + (j - y)/hyp	
+					dx = i - x
+					dy = y - j
+					hyp = math.sqrt((dx*dx)+(dy*dy))
+					if hyp > 0:
+						print("x: {} y {} dx: {} dy: {}".format(i, j, dx, dy))
+						sum_dx += dx/hyp
+						sum_dy += dy/hyp	
 				i += 1
 			j += 1
+		
+		print("\nsum_dx:{} sum_dy:{}".format(sum_dx, sum_dy))
 		self.foundObj(sum_dx, sum_dy, theta, x, y, rad)
 				
 
@@ -270,13 +286,13 @@ if __name__ == "__main__":
 	theta = None
 	drone_vehicle = DroneVehicle(connected=False)
 	print(os.getcwd())
-	with open("test/data/map_data/position_north.txt", "r") as f:	
+	with open("test/data/map_data/position_90.txt", "r") as f:	
 		position = f.readline().split(" ")	
 		print(position)
 		x = float(position[0])
 		y = float(position[1])
 		theta = float(position[2])
-	map_data = np.loadtxt("test/data/map_data/map_data_north.txt", dtype=np.uint8, delimiter=' ')
+	map_data = np.loadtxt("test/data/map_data/map_data_90.txt", dtype=np.uint8, delimiter=' ')
 	plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
 	plt.show()
 	drone_vehicle.parseMapData(x, y, theta, map_data)

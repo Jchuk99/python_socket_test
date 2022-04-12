@@ -3,6 +3,7 @@ import numpy as np
 import time
 import pathlib
 import platform
+
 if platform.system() == 'Windows':
     lib_path = pathlib.Path(__file__).parent.resolve()
     lib_path = pathlib.Path(lib_path, 'libs', 'Windows', 'x64', 'pylidar.dll')
@@ -19,7 +20,8 @@ class PyLidar(object):
     def __init__(self, port, baud_rate):
         lib.createLidar.restype = c_void_p
         lib.createLidar.argtypes = [c_char_p, c_int]
-        self.obj = c_void_p(lib.createLidar(c_char_p(str.encode(port)), c_int(115200)))
+        print(str.encode(port))
+        self.obj = c_void_p(lib.createLidar(str.encode(port), c_int(115200)))
     
     def free(self, ptr):
         lib.freeMem.argtypes = [c_void_p]
@@ -82,7 +84,7 @@ class PyLidar(object):
 
 
 if __name__ == "__main__":
-    lidar = PyLidar("COM5", 115200)
+    lidar = PyLidar("COM7", 115200)
     print("Connected: {} ".format(lidar.is_connected()))
     lidar.connect()
     print("Connected: {} ".format(lidar.is_connected()))
@@ -101,7 +103,8 @@ if __name__ == "__main__":
                     lidar_scans.data[i][2]
                 )
             )
-        #lidar.free(lidar_scans)
+    lidar.stop_motor()
+    time.sleep(10)
     with open("lidar_scan_2_np.txt", "w") as file1:
         lidar_scans = lidar.get_lidar_scans_as_np(True)
         np.savetxt("lidar_scan_2_np.txt", lidar_scans)
