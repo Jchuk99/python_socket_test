@@ -92,7 +92,7 @@ class DroneServer:
             
 
     def handle_map_client(self, conn):
-        #print("Sending map data.")
+        print("Sending map data.")
 
         # get data
         map_data = self.drone_map.get_map_data()

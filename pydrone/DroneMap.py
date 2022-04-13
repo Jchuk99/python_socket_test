@@ -40,7 +40,7 @@ class DroneMap:
                 # connects the lidar using the default port (tty/USB0)
                 self.lidar.connect()
                 # Starts the lidar motor
-                self.lidar.stop_motor()
+                self.lidar.start_motor()
         except OSError:
             print("Lidar is not properly connected.")
             sys.exit()
@@ -60,7 +60,7 @@ class DroneMap:
         # ultrasonic stuff?
 
     def read_lidar_data(self):
-        while True:
+        while self.running:
             self.current_lidar_reading = self.lidar.get_lidar_scans_as_np(True)
             sleep(.02)
   
@@ -81,7 +81,7 @@ class DroneMap:
         # Initialize empty map
         mapbytes = bytearray(MAP_SIZE_PIXELS * MAP_SIZE_PIXELS)
 
-        while True:
+        while self.running:
             items = self.current_lidar_reading
             num_rows, num_cols = items.shape
             if num_rows > 2 :
@@ -123,7 +123,8 @@ class DroneMap:
 
     def stop(self):
         print('stopping lidar')
-       # self.lidar.stopmotor()
+        self.running = False
+        self.lidar.stop_motor()
         self.lidar.disconnect()
         self.lidar_thread.join()
         self.map_thread.join()

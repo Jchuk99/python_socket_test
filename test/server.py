@@ -52,6 +52,7 @@ def main(args):
                 sleep(1)
             except KeyboardInterrupt:
                 print('interrupt')
+                drone_map.stop()
                 drone_vehicle.stop()
                 drone_server.stop()
                 break
