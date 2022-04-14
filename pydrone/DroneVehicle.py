@@ -72,7 +72,13 @@ class DroneVehicle:
 	def start(self, targetAlt):
 
 		self.running = True
-
+		
+		#find drone heading, adjust to face east and convert negative angles to positive
+		self.delta_theta = self.vehicle.heading() - 90
+		if self.delta_theta < 0:
+			self.delta_theta = 360 + self.delta_theta
+		
+		
 		self.telemetry_thread.start()
 
 		print("Arming motors")
@@ -145,7 +151,31 @@ class DroneVehicle:
 				0,0)
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
+	
+
+	def compusAdj(self,hyp,dx,dy):
+		orig = math.degrees(math.tan(-dy/-dx))
+
+		new_angle = orig - self.delta_theta
+
+		if new_angle < 0:
+			new_angle = 360 + new_angle
+
+		new_dx = hyp*math.acos(new_angle)
+		new_dy = hyp*math.asin(new_angle)
+
+		if new_angle > 90 and new_angle <= 180:
+			new_dx = -new_dx
+		elif new_angle > 180 and new_angle <= 270:
+			new_dx = -new_dx
+			new_dy = -new_dy
+		elif new_angle > 270 and new_angle < 360:
+			new_dy = -new_dy
+
+		return new_dx,new_dy
+
 		
+	
 	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
 
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
