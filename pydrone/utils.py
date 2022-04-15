@@ -6,6 +6,7 @@ import copy
 MAP_SIZE_PIXELS         = 500
 MAP_SIZE_METERS         = 10
 MAP_SCALE_METERS_PER_PIXEL = MAP_SIZE_METERS / float(MAP_SIZE_PIXELS)
+RADIUS = 1
 HEADER = 64
 
 # MESSAGE PROTOCOL:
@@ -18,6 +19,48 @@ def send_message(client, header_msg, msg):
         padded_header_msg = header_msg + b' ' * (HEADER - len(header_msg))
         client.send(padded_header_msg)
         client.send(msg)
+
+def find_radius(x_mm,y_mm):
+    #mm -> m
+    x = x_mm/1000
+    y = y_mm/1000
+    # flip, so x = y, y = x (for indexing into data)
+
+    #m => pixels
+    x = x/MAP_SCALE_METERS_PER_PIXEL
+    y = y/MAP_SCALE_METERS_PER_PIXEL
+
+    x = round(x)
+    y = round(y)
+
+    #max range
+    s = MAP_SIZE_PIXELS
+    #radius in meters
+    rad = RADIUS
+    #m -> pixels
+    ran = rad/MAP_SCALE_METERS_PER_PIXEL
+        
+    #radius of drone detection
+    x_min = int(x-ran)
+    x_max = int(x+ran)
+    y_min = int(y-ran)
+    y_max = int(y+ran)
+        
+    #adjust for out of bounds
+    if x_min < 0:
+        x_min = 0
+        
+    if y_min < 0:
+        y_min = 0
+
+    if x_max > s:
+        x_max = s
+
+    if y_max > s:
+        y_max = s
+
+    return x,y,x_min,x_max,y_min,y_max
+    
 
 @dataclass
 class Telemetry:

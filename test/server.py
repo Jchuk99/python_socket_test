@@ -5,14 +5,15 @@ import argparse
 import utils
 from DroneVehicle import DroneVehicle
 from DroneServer import DroneServer
-from DroneMap import DroneMap
+#from DroneMap import DroneMap
 from queue import Queue
 from time import sleep
+import logging
 
 
 def main(args):
 
-    print(args)
+    logging.basicConfig(filename=args.file, encoding='utf-8', level=logging.DEBUG)
     drone_map = DroneMap(run=args.no_lidar)  # thread-safe map object
     message_queue = Queue()  # thread-safe message queue class 
 
@@ -38,24 +39,25 @@ def main(args):
                 # AKA we start a new thread to get the drone to hov`er, and run obstacle avoidance
                 # give this thread: 
                 # drone_map to run obstacle avoidance using provided info,
-                print('drone is starting')
+                logging.debug('drone is starting')
                 drone_vehicle.run()
             elif message == 'STOP':
-                print('drone is stopping')
+                logging.debug('drone is stopping')
             elif message == 'ARM':
-                print('drone is arming')
+                logging.debug('drone is arming')
             elif message == 'DISARM':
-                print('drone is disarming')
+                logging.debug('drone is disarming')
         else:
             try:
                 #print("drone server is not blocking")
                 sleep(1)
             except KeyboardInterrupt:
-                print('interrupt')
+                logging.debug('interrupt')
                 drone_map.stop()
                 drone_vehicle.stop()
                 drone_server.stop()
                 break
+        sleep(.1)
 
 
 if __name__ == "__main__":
@@ -63,5 +65,6 @@ if __name__ == "__main__":
     parser.add_argument( '--no_lidar', default = True, action='store_false')
     parser.add_argument( '--no_connect_drone', default = True, action='store_false')
     parser.add_argument( '--no_gui', default = False, action='store_true')
+    parser.add_argument('-f', '--file', default='drone_log.txt')
     args = parser.parse_args()
     main(args)

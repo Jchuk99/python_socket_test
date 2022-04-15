@@ -143,7 +143,7 @@ class Visualizer(object):
 
         # Refresh display, setting flag on window close or keyboard interrupt
         try:
-            sleep(.01) # Arbitrary pause to force redraw
+            sleep(.05) # Arbitrary pause to force redraw
             return True
         except:
             return False
@@ -169,6 +169,7 @@ class MapVisualizer(Visualizer):
 
         mapimg = np.reshape(np.frombuffer(mapbytes, dtype=np.uint8), (self.map_size_pixels, self.map_size_pixels))
 
+        print('drawing new data')
         # Pause to allow display to refresh
         sleep(.01)
 

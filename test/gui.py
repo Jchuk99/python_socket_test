@@ -11,8 +11,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+
 sys.path.append(r"../pydrone")
 sys.path.append(r"../pydrone/clients")
+import utils
 from PyLidar import PyLidar
 from roboviz import MapVisualizer
 from DroneClients import DroneClients
@@ -27,7 +29,7 @@ class GroundStation:
 
         self.app = QApplication([])
         self.window = Window()
-        self.drone_clients = DroneClients("172.20.10.5", 5050)
+        self.drone_clients = DroneClients("10.0.0.238", 5050)
         # self.lidar = PyLidar("COM5", 115200)
         # # connects the lidar using the default port (tty/USB0)
         # self.lidar.connect()
@@ -43,14 +45,19 @@ class GroundStation:
             'SLAM', show_trajectory=True 
         )
 
-        self.canvas = FigureCanvas(plt.Figure())
+        self.lidar_canvas = FigureCanvas(plt.Figure())
+        self.obstacle_canvas = FigureCanvas(plt.Figure())
 
-        self.form.lidarGraph.addWidget(self.canvas)
+        self.form.obstacleGraph.addWidget(self.obstacle_canvas)
+        self.form.lidarGraph.addWidget(self.lidar_canvas)
         self.form.mapGraph.addWidget(self.map_viz.canvas)
 
-        self.ax = self.canvas.figure.add_subplot(projection='polar')
-        self.ax.set_rmax(8000)
-        self.ax.grid(True)
+
+        self.lidar_ax = self.lidar_canvas.figure.add_subplot(projection='polar')
+        self.lidar_ax.set_rmax(8000)
+        self.lidar_ax.grid(True)
+
+        self.obstacle_ax = self.obstacle_canvas.figure.add_subplot()
 
         self.form.tabWidget.currentChanged.connect(self.tabChanged)
         self.form.connectButton.clicked.connect(self.connectDrone)
@@ -65,6 +72,7 @@ class GroundStation:
 
         self.lidar_render_thread = Thread(target = self.update_lidar_render)
         self.map_render_thread = Thread(target = self.update_map_render)
+        self.obstacle_render_thread = Thread(target = self.update_obstacle_render)
 
     def tabChanged(self):
         print("Tab was changed to", self.form.tabWidget.currentIndex())
@@ -77,10 +85,10 @@ class GroundStation:
         while self.connected:
             arr = self.drone_clients.get_map_data().lidar_data
             #arr = self.lidar.get_lidar_scans_as_np(filter_quality=True)
-            self.ax.clear()
+            self.lidar_ax.clear()
             theta = np.radians(arr[:, 1])
-            self.ax.scatter(theta, arr[:, 2], s = 1)
-            self.canvas.draw()
+            self.lidar_ax.scatter(theta, arr[:, 2], s = 1)
+            self.lidar_canvas.draw()
             sleep(.1)
     
     def update_map_render(self):
@@ -93,6 +101,15 @@ class GroundStation:
                     env_map.theta, env_map.mapbytes
                 ):
                     exit(0)
+    
+    def update_obstacle_render(self):
+        while self.connected:
+            env_map = self.drone_clients.get_map_data()
+            x,y,x_min,x_max,y_min,y_max = utils.find_radius(env_map.x, env_map.y)
+            self.obstacle_ax.clear()
+            self.obstacle_ax.imshow(env_map[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
+            self.obstacle_canvas.draw()
+            sleep(.1)
 
 
     def connectDrone(self):
@@ -101,11 +118,13 @@ class GroundStation:
             self.drone_clients.run()
             self.lidar_render_thread.start()
             self.map_render_thread.start()
+            self.obstacle_render_thread.start()
         else:
             self.connected = False
             self.drone_clients.stop()
             self.lidar_render_thread.join()
             self.map_render_thread.join()
+            self.obstacle_render_thread.join()
 
     def start_command(self):
         if self.connected:

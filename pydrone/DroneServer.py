@@ -5,6 +5,8 @@ from time import sleep
 import threading, queue
 import pickle
 import socket
+import logging
+
 
 # this class is meant to be run in a seperate thread
 class DroneServer:
@@ -42,12 +44,12 @@ class DroneServer:
                 break
 
     def stop(self):
-        print('closing server')
+        logging.info('Closing server')
         self.server.close()
 
 
     def handle_client(self, conn, addr):
-        print(f"[NEW CONNECTION] {addr} connected.")
+        logging.info("[NEW CONNECTION] %s connected.", addr)
         init = False
         connected = True
         client_type = None
@@ -92,7 +94,7 @@ class DroneServer:
             
 
     def handle_map_client(self, conn):
-        print("Sending map data.")
+        logging.info('Sendig map info')
 
         # get data
         map_data = self.drone_map.get_map_data()
@@ -105,7 +107,7 @@ class DroneServer:
         utils.send_message(conn, header, byte_map_data)
 
     def handle_telemetry_client(self, conn):
-        #print("Sending telemetry data")
+        logging.info("Sending telemetry data")
 
         # get data
         telemetry = self.drone_vehicle.telemetry
@@ -119,7 +121,7 @@ class DroneServer:
 
 
     def handle_command_client(self, conn, msg):
-        print(f"Command {msg} was receivied from the client") 
+        logging.info("Command %s was receivied from the client", msg) 
         self.message_queue.put(msg)
   
 

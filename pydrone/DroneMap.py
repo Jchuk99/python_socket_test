@@ -27,6 +27,7 @@ import numpy as np
 import threading
 from time import sleep
 import time
+import logging
 
 
 
@@ -62,7 +63,7 @@ class DroneMap:
     def read_lidar_data(self):
         while self.running:
             self.current_lidar_reading = self.lidar.get_lidar_scans_as_np(True)
-            sleep(.02)
+            sleep(.05)
   
     def update_map(self):
         self.slam = RMHC_SLAM(
@@ -100,17 +101,12 @@ class DroneMap:
                     self.slam.update(previous_distances)
                     # Get current robot position
                 x, y, theta = self.slam.getpos()
-               # print(
-               #     'x:{}, y:{}, theta:{}'.format(
-               #         x,y,theta
-               #      )
-               # )
                 # Get current map bytes as grayscale
                 self.slam.getmap(mapbytes)
                 self.map = MapData(
                     items,mapbytes,x,y,theta
                 )
-            sleep(.02)
+            sleep(.05)
 
         pass
 
@@ -122,7 +118,7 @@ class DroneMap:
             self.map_thread.start()
 
     def stop(self):
-        print('stopping lidar')
+        logging.info('Stopping map')
         self.running = False
         self.lidar.stop_motor()
         self.lidar.disconnect()

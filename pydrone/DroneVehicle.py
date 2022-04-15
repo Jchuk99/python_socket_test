@@ -11,6 +11,8 @@ import os
 import time
 from time import sleep
 
+
+import logging
 import socket
 import argparse
 import math
@@ -146,7 +148,7 @@ class DroneVehicle:
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
 		
-	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
+	def foundObj(self,dx,dy,theta,x_orig,y_orig):
 
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
@@ -211,46 +213,19 @@ class DroneVehicle:
 	
 	def parseMapData(self,x_mm,y_mm,theta,data):
 		print("x_old :" + str(x_mm) + "\ny_old: " + str(y_mm))
-		#mm -> m
-		x = x_mm/1000
-		y = y_mm/1000
-		# flip, so x = y, y = x (for indexing into data)
-		
-		#m => pixels
-		x = x/0.02
-		y = y/0.02
+	
 
-		x = round(x)
-		y = round(y)
+		x,y,x_min,x_max,y_min,y_max = utils.find_radius(x_mm, y_mm)
 
 		print("x :" + str(x) + "\ny: " + str(y))
-		#max range
-		s = math.sqrt(data.size)
-		#radius in meters
-		rad = .70
-		#m -> pixels
-		ran = rad/.02
-		
-		#radius of drone detection
-		x_min = x-ran
-		x_max = x+ran
-		y_min = y-ran
-		y_max = y+ran
-		
-		#adjust for out of bounds
-		if x_min < 0:
-			x_min = 0
-			
-		if y_min < 0:
-			y_min = 0
-		
-		if x_max > s:
-			x_max = s
-		
-		if y_max > s:
-			y_max = s
-		
+		plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
+		plt.plot(x,y,'ro') 
+		plt.show()
+
 		print("x_max:{} x_min: {}y_max: {} y_min: {}".format(x_max,x_min, y_max,y_min))
+		plt.imshow(map_data[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
+		plt.show()
+
 		#iterators
 		i = int(x_min)
 		j = int(y_min)
@@ -268,34 +243,43 @@ class DroneVehicle:
 					dy = y - j
 					hyp = math.sqrt((dx*dx)+(dy*dy))
 					if hyp > 0:
-						print("x: {} y {} dx: {} dy: {}".format(i, j, dx, dy))
+						#print("x: {} y {} dx: {} dy: {}".format(i, j, dx, dy))
 						sum_dx += dx/hyp
 						sum_dy += dy/hyp	
 				i += 1
 			j += 1
 		
 		print("\nsum_dx:{} sum_dy:{}".format(sum_dx, sum_dy))
-		self.foundObj(sum_dx, sum_dy, theta, x, y, rad)
+
+		self.foundObj(sum_dx, sum_dy, theta, x, y)
 				
 
 
 if __name__ == "__main__":
+    
+	files = ['1', '2', '3','4', '90', '180', '270', 'North']
+	file_base = '../test/data/map_data'
 	map_data = None
 	x = None
 	y = None
 	theta = None
 	drone_vehicle = DroneVehicle(connected=False)
 	print(os.getcwd())
-	with open("test/data/map_data/position_90.txt", "r") as f:	
-		position = f.readline().split(" ")	
-		print(position)
-		x = float(position[0])
-		y = float(position[1])
-		theta = float(position[2])
-	map_data = np.loadtxt("test/data/map_data/map_data_90.txt", dtype=np.uint8, delimiter=' ')
-	plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
-	plt.show()
-	drone_vehicle.parseMapData(x, y, theta, map_data)
+
+	for file_tag in files:
+    	
+		position_file = '{}/position_{}.txt'.format(file_base, file_tag)
+		map_file = '{}/map_data_{}.txt'.format(file_base, file_tag) 
+
+		with open(position_file, "r") as f:	
+			position = f.readline().split(" ")	
+			print(position)
+			x = float(position[0])
+			y = float(position[1])
+			theta = float(position[2])
+
+		map_data = np.loadtxt(map_file, dtype=np.uint8, delimiter=' ')
+		drone_vehicle.parseMapData(x, y, theta, map_data)
 
 
 
