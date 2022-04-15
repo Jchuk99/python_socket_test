@@ -74,7 +74,13 @@ class DroneVehicle:
 	def start(self, targetAlt):
 
 		self.running = True
-
+		
+		#find drone heading, adjust to face east and convert negative angles to positive
+		self.delta_theta = self.vehicle.heading() - 90
+		if self.delta_theta < 0:
+			self.delta_theta = 360 + self.delta_theta
+		
+		
 		self.telemetry_thread.start()
 
 		print("Arming motors")
@@ -147,8 +153,36 @@ class DroneVehicle:
 				0,0)
 		self.vehicle.send_mavlink(msg)
 		self.vehicle.flush()
+	
+
+	def compassAdj(self,hyp,dx,dy):
+		orig = math.degrees(math.tan(-dy/-dx))
+
+		new_angle = orig - self.delta_theta
+
+		if new_angle < 0:
+			new_angle = 360 + new_angle
+
+		new_dx = hyp*math.acos(new_angle)
+		new_dy = hyp*math.asin(new_angle)
+
+		if new_angle > 90 and new_angle <= 180:
+			new_dx = -new_dx
+		elif new_angle > 180 and new_angle <= 270:
+			new_dx = -new_dx
+			new_dy = -new_dy
+		elif new_angle > 270 and new_angle < 360:
+			new_dy = -new_dy
+
+		return new_dx,new_dy
+
 		
+<<<<<<< HEAD
 	def foundObj(self,dx,dy,theta,x_orig,y_orig):
+=======
+	
+	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
+>>>>>>> 4ab6cee02ed2a770cb707f266212851c7e57c1f5
 
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
@@ -183,6 +217,10 @@ class DroneVehicle:
 
 		red = .35
 
+		#function to adjust for drone heading
+		#dx, dy = self.compassAdj(hyp,dx,dy)
+
+		#may need to uninvert dx and dy below when adding in the compass adjustment
 		print("vx before red : {}".format(-dx/hyp))
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
