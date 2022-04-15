@@ -153,7 +153,7 @@ class DroneVehicle:
 		self.vehicle.flush()
 	
 
-	def compusAdj(self,hyp,dx,dy):
+	def compassAdj(self,hyp,dx,dy):
 		orig = math.degrees(math.tan(-dy/-dx))
 
 		new_angle = orig - self.delta_theta
@@ -211,6 +211,10 @@ class DroneVehicle:
 
 		red = .35
 
+		#function to adjust for drone heading
+		#dx, dy = self.compassAdj(hyp,dx,dy)
+
+		#may need to uninvert dx and dy below when adding in the compass adjustment
 		print("vx before red : {}".format(-dx/hyp))
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
