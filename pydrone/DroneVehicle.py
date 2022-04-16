@@ -74,10 +74,9 @@ class DroneVehicle:
 		self.running = True
 		
 		#find drone heading, adjust to face east and convert negative angles to positive
-		self.delta_theta = self.vehicle.heading() - 90
+		self.delta_theta = self.vehicle.heading - 90
 		if self.delta_theta < 0:
 			self.delta_theta = 360 + self.delta_theta
-		
 		
 		self.telemetry_thread.start()
 
@@ -103,7 +102,7 @@ class DroneVehicle:
 			if self.vehicle.location.global_relative_frame.alt>=targetAlt*0.95:
 				print("Reached target altitude")
 				break
-			time.sleep(15)
+			time.sleep(3)
 
 		print("attempting to land")
 		while self.running:
@@ -247,7 +246,6 @@ class DroneVehicle:
 	
 	def parseMapData(self,x_mm,y_mm,theta,data):
 		print("x_old :" + str(x_mm) + "\ny_old: " + str(y_mm))
-	
 
 		x,y,x_min,x_max,y_min,y_max = utils.find_radius(x_mm, y_mm)
 
