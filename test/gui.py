@@ -15,7 +15,7 @@ import matplotlib.animation as animation
 sys.path.append(r"../pydrone")
 sys.path.append(r"../pydrone/clients")
 import utils
-from PyLidar import PyLidar
+# from PyLidar import PyLidar
 from roboviz import MapVisualizer
 from DroneClients import DroneClients
 
