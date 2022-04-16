@@ -118,9 +118,10 @@ class GroundStation:
         if not self.connected:
             self.connected = True
             self.drone_clients.run()
-            self.lidar_render_thread.start()
-            self.map_render_thread.start()
-            self.obstacle_render_thread.start()
+            if not self.lidar_render_thread.is_alive():
+                self.lidar_render_thread.start()
+                self.map_render_thread.start()
+                self.obstacle_render_thread.start()
         else:
             self.connected = False
             self.drone_clients.stop()

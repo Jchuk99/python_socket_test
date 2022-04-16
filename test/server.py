@@ -5,7 +5,7 @@ import argparse
 import utils
 from DroneVehicle import DroneVehicle
 from DroneServer import DroneServer
-#from DroneMap import DroneMap
+from DroneMap import DroneMap
 from queue import Queue
 from time import sleep
 import logging
