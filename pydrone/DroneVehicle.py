@@ -1,5 +1,5 @@
 
-from ssl import VERIFY_X509_PARTIAL_CHAIN
+#from ssl import VERIFY_X509_PARTIAL_CHAIN
 from dronekit import VehicleMode, connect, LocationGlobalRelative
 import sys
 sys.path.append(".")
@@ -211,6 +211,7 @@ class DroneVehicle:
 		#angle = math.degrees(math.atan(dy/dx))
 		hyp = math.sqrt((dx*dx)+(dy*dy))
 		if hyp == 0:
+			self.stopMov()
 			print("\n no velocity is being sent")
 			return
 
@@ -229,7 +230,7 @@ class DroneVehicle:
 
 		#set velocity
 		if not self.debug:
-			#self.setV(vy,vx,0)
+			self.setV(vy,vx,0)
 			pass
 
 		#time.sleep(1)
