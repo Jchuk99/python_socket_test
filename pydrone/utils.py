@@ -93,8 +93,7 @@ class MapData:
 
     def get_map_as_np(self):
         map_arr = np.frombuffer(self.mapbytes, dtype=np.uint8, count=-1)
-        if map_arr.shape[1] > 0:
-            map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
+        map_arr = map_arr.reshape(MAP_SIZE_PIXELS, MAP_SIZE_PIXELS)
         return map_arr
     
     def get_occupancy_grid(self):

@@ -20,9 +20,9 @@ import math
 # responsible for running code that moves the vehicle
 class DroneVehicle:
 
-	def __init__(self, drone_map = None, connected = True):
-    		#connect to flight controller
+	def __init__(self, drone_map = None, connected = True, debug = False):
 		#THIS SHOULD BE THE EXACT SAME OBJECT THAT DRONE SERVER IS TALKING TO
+		self.debug = debug
 		self.connected = connected
 		self.drone_map = drone_map
 		self.isRunning = utils.LockedObject()
@@ -35,8 +35,6 @@ class DroneVehicle:
 
 		if self.connected:
 			self.vehicle = connect('udp:127.0.0.1:14550', wait_ready=True)
-		#self.vehicle = connect(self.addr, wait_ready=True)
-		#vehicle = connect('tcp:192.168.1.1:5760', wait_ready=True)
 
 	def read(self):
 		while self.running:
@@ -111,7 +109,8 @@ class DroneVehicle:
 		while self.running:
 			self.vehicle.mode = VehicleMode("LAND")
 			# obstacle detection goes here
-			#self.parseMapData(self.drone_map.map.x,self.drone_map.map.y,self.drone_map.map.theta,self.drone_map.map.get_map_as_np())
+			env_map = self.drone_map.map
+			self.parseMapData(env_map.x, env_map.y, env_map.theta, env_map.get_occupancy_grid())
 		
 	def testMov(self):
 		#north
@@ -177,13 +176,8 @@ class DroneVehicle:
 		return new_dx,new_dy
 
 		
-<<<<<<< HEAD
 	def foundObj(self,dx,dy,theta,x_orig,y_orig):
-=======
-	
-	def foundObj(self,dx,dy,theta,x_orig,y_orig,r):
->>>>>>> 4ab6cee02ed2a770cb707f266212851c7e57c1f5
-
+    
 		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
 
@@ -215,7 +209,7 @@ class DroneVehicle:
 			print("\n no velocity is being sent")
 			return
 
-		red = .35
+		red = .45
 
 		#function to adjust for drone heading
 		#dx, dy = self.compassAdj(hyp,dx,dy)
@@ -226,7 +220,9 @@ class DroneVehicle:
 		vy = (-dy/hyp)*red
 
 		#set velocity
-		#self.setV(vy,vx,0)
+		if not self.debug:
+			self.setV(vy,vx,0)
+
 		#time.sleep(1)
 		#self.stopMov()
 		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx, 2)))
@@ -256,13 +252,15 @@ class DroneVehicle:
 		x,y,x_min,x_max,y_min,y_max = utils.find_radius(x_mm, y_mm)
 
 		print("x :" + str(x) + "\ny: " + str(y))
-		plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
-		plt.plot(x,y,'ro') 
-		plt.show()
+		if self.debug:
+			plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
+			plt.plot(x,y,'ro') 
+			plt.show()
 
 		print("x_max:{} x_min: {}y_max: {} y_min: {}".format(x_max,x_min, y_max,y_min))
-		plt.imshow(map_data[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
-		plt.show()
+		if self.debug:
+			plt.imshow(map_data[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
+			plt.show()
 
 		#iterators
 		i = int(x_min)
@@ -278,7 +276,7 @@ class DroneVehicle:
 				if data[j, i] == 1:
 					# i represents y here (rows), j represents x (cols)
 					dx = i - x
-					dy = y - j
+					dy = j - y
 					hyp = math.sqrt((dx*dx)+(dy*dy))
 					if hyp > 0:
 						#print("x: {} y {} dx: {} dy: {}".format(i, j, dx, dy))
@@ -301,7 +299,7 @@ if __name__ == "__main__":
 	x = None
 	y = None
 	theta = None
-	drone_vehicle = DroneVehicle(connected=False)
+	drone_vehicle = DroneVehicle(connected=False, debug=True)
 	print(os.getcwd())
 
 	for file_tag in files:
@@ -322,4 +320,4 @@ if __name__ == "__main__":
 
 
 
-
+ 
