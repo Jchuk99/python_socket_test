@@ -5,7 +5,7 @@ import argparse
 import utils
 from DroneVehicle import DroneVehicle
 from DroneServer import DroneServer
-#from DroneMap import DroneMap
+from DroneMap import DroneMap
 from queue import Queue
 from time import sleep
 import logging
@@ -23,9 +23,9 @@ def main(args):
     if args.no_gui:
         message_queue.put('START')
  
-    drone_vehicle = DroneVehicle(drone_map, connected = args.no_connect_drone)
+    drone_vehicle = DroneVehicle(drone_map, connected = args.no_connect_drone, debug = args.debug)
     drone_server = DroneServer(drone_map, drone_vehicle, message_queue,"172.20.10.5", 5050)
-    #drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.39", 5050)
+    #drone_server = DroneServer(drone_map, drone_vehicle, message_queue, "10.0.0.238", 5050)
 
     drone_map.run()
     drone_server.run()
@@ -64,6 +64,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
     parser.add_argument( '--no_lidar', default = True, action='store_false')
     parser.add_argument( '--no_connect_drone', default = True, action='store_false')
+    parser.add_argument('-d', '--debug', default = False, action='store_true')
     parser.add_argument( '--no_gui', default = False, action='store_true')
     parser.add_argument('-f', '--file', default='drone_log.txt')
     args = parser.parse_args()

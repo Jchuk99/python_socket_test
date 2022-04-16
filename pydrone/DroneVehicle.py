@@ -78,7 +78,6 @@ class DroneVehicle:
 	def start(self, targetAlt):
 
 		self.running = True
-		
 		#find drone heading, adjust to face east and convert negative angles to positive
 		self.delta_theta = self.vehicle.heading - 90
 		if self.delta_theta < 0:
@@ -86,37 +85,44 @@ class DroneVehicle:
 		
 		self.telemetry_thread.start()
 
-		print("Arming motors")
-		# Copter should arm in GUIDED mode
-		self.vehicle.mode    = VehicleMode("GUIDED")
-		self.vehicle.armed   = True
+		if self.debug:
+			self.obstacle_detection()
+		else:
+      
+			print("Arming motors")
+			# Copter should arm in GUIDED mode
+			self.vehicle.mode    = VehicleMode("GUIDED")
+			self.vehicle.armed   = True
 
-		# Confirm vehicle armed before attempting to take off
-		while not self.vehicle.armed:
-			print(" Waiting for arming...")
-			time.sleep(1)
+			# Confirm vehicle armed before attempting to take off
+			while not self.vehicle.armed:
+				print(" Waiting for arming...")
+				time.sleep(1)
 
-		print(f'vehicle.mode: {self.vehicle.mode}')
-		print("Taking off!")
-		self.vehicle.simple_takeoff(.75) # Take off to target altitude
+			print(f'vehicle.mode: {self.vehicle.mode}')
+			print("Taking off!")
+			self.vehicle.simple_takeoff(.75) # Take off to target altitude
 
-		# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
-		#  after Vehicle.simple_takeoff will execute immediately).
-		while True:
-			print(" Altitude: ", self.vehicle.location.global_relative_frame.alt)
-			#Break and return from function just below target altitude.
-			if self.vehicle.location.global_relative_frame.alt>=targetAlt*0.95:
-				print("Reached target altitude")
-				break
-			time.sleep(3)
-
-		print("attempting to land")
+			# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
+			#  after Vehicle.simple_takeoff will execute immediately).
+			while True:
+				print(" Altitude: ", self.vehicle.location.global_relative_frame.alt)
+				#Break and return from function just below target altitude.
+				if self.vehicle.location.global_relative_frame.alt>=targetAlt*0.95:
+					print("Reached target altitude")
+					break
+				time.sleep(3)
+			self.obstacle_detection()
+    
+	def obstacle_detection(self):
+		print("starting obstacle detection")
 		while self.running:
-			self.vehicle.mode = VehicleMode("LAND")
+			#self.vehicle.mode = VehicleMode("LAND")
 			# obstacle detection goes here
 			env_map = self.drone_map.map
-			self.parseMapData(env_map.x, env_map.y, env_map.theta, env_map.get_occupancy_grid())
-		
+			if env_map.mapbytes:
+				self.parseMapData(env_map.x, env_map.y, env_map.theta, env_map.get_occupancy_grid())
+    
 	def testMov(self):
 		#north
 		self.setV(.35,0,0)
@@ -138,12 +144,11 @@ class DroneVehicle:
 		time.sleep(2)
 		self.stopMov()
 		time.sleep(2)
-	
-	
-	def stop(self):
-		self.vehicle.mode = VehicleMode("LAND")
-		self.running = False
 
+	def stop(self):
+		self.running = False
+		sleep(.01)
+		self.vehicle.mode = VehicleMode("LAND")
 
 	def setV(self, Vx, Vy, Vz):
 		msg = self.vehicle.message_factory.set_position_target_local_ned_encode(
@@ -213,6 +218,7 @@ class DroneVehicle:
 		if hyp == 0:
 			self.stopMov()
 			print("\n no velocity is being sent")
+			self.stopMov()
 			return
 
 		red = .45
@@ -233,8 +239,6 @@ class DroneVehicle:
 			self.setV(vy,vx,0)
 			pass
 
-		#time.sleep(1)
-		#self.stopMov()
 		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx, 2)))
 		if(vx < 0):
 			print('west')
