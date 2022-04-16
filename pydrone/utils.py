@@ -72,6 +72,8 @@ class Telemetry:
     airspeed : float = 0.0
     groundspeed : float = 0.0
     flight_mode : str = ""
+    vx : float = 0.0
+    vy : float = 0.0
 
     def __str__(self):
         string = """altitude: {} m, pitch: {}, yaw: {}, roll: {},

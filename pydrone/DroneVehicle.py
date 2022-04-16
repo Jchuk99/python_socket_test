@@ -1,4 +1,5 @@
 
+from ssl import VERIFY_X509_PARTIAL_CHAIN
 from dronekit import VehicleMode, connect, LocationGlobalRelative
 import sys
 sys.path.append(".")
@@ -29,6 +30,9 @@ class DroneVehicle:
 		self.isRunning = False
 		self.telemetry = utils.LockedObject()
 		self.telemetry = utils.Telemetry()
+  
+		self.vx = None
+		self.vy = None 
 
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
@@ -46,7 +50,9 @@ class DroneVehicle:
 				self.vehicle.velocity,
 				self.vehicle.airspeed,
 				self.vehicle.groundspeed,
-				self.vehicle.mode.name
+				self.vehicle.mode.name,
+				self.vx,
+				self.vy
 			)
 			sleep(2)
 
@@ -217,6 +223,9 @@ class DroneVehicle:
 		print("vx before red : {}".format(-dx/hyp))
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
+  
+		self.vx = vx
+		self.vy = vy
 
 		#set velocity
 		if not self.debug:
@@ -252,14 +261,16 @@ class DroneVehicle:
 
 		print("x :" + str(x) + "\ny: " + str(y))
 		if self.debug:
-			plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
-			plt.plot(x,y,'ro') 
-			plt.show()
+			# plt.imshow(map_data, cmap='gray', vmin=0, vmax=1)
+			# plt.plot(x,y,'ro') 
+			# plt.show()
+			pass
 
 		print("x_max:{} x_min: {}y_max: {} y_min: {}".format(x_max,x_min, y_max,y_min))
 		if self.debug:
-			plt.imshow(map_data[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
-			plt.show()
+			# plt.imshow(map_data[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
+			# plt.show()
+			pass
 
 		#iterators
 		i = int(x_min)
