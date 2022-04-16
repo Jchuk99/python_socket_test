@@ -220,7 +220,8 @@ class DroneVehicle:
 
 		#set velocity
 		if not self.debug:
-			self.setV(vy,vx,0)
+			#self.setV(vy,vx,0)
+			pass
 
 		#time.sleep(1)
 		#self.stopMov()

@@ -13,7 +13,7 @@ import logging
 
 def main(args):
 
-    logging.basicConfig(filename=args.file, encoding='utf-8', level=logging.DEBUG)
+    logging.basicConfig(filename=args.file, level=logging.DEBUG)
     drone_map = DroneMap(run=args.no_lidar)  # thread-safe map object
     message_queue = Queue()  # thread-safe message queue class 
 
