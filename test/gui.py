@@ -25,12 +25,12 @@ MAP_SIZE_METERS         = 10
 class GroundStation:
 
     def __init__(self):
-        Form, Window = uic.loadUiType("test.ui")		
+        Form, Window = uic.loadUiType("test.ui")	
 
         self.app = QApplication([])
         self.window = Window()
         #self.drone_clients = DroneClients("10.0.0.238", 5050)
-        self.drone_clients = DroneClients("10.0.0.238", 5050)
+        self.drone_clients = DroneClients("172.20.10.5", 5050)
         # self.lidar = PyLidar("COM5", 115200)
         # # connects the lidar using the default port (tty/USB0)
         # self.lidar.connect()
@@ -106,10 +106,14 @@ class GroundStation:
     def update_obstacle_render(self):
         while self.connected:
             env_map = self.drone_clients.get_map_data()
+            vx,vy = self.drone_clients.get_calculated_velocity()
+            print(str(vx) + " " + str(vy))
             x,y,x_min,x_max,y_min,y_max = utils.find_radius(env_map.x, env_map.y)
             self.obstacle_ax.clear()
             if env_map.mapbytes:
+                arr = [vx, vy]
                 self.obstacle_ax.imshow(env_map.get_occupancy_grid()[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
+                self.obstacle_ax.arrow(0, 0, *arr, head_width=0.05, head_length=0.1)
                 self.obstacle_canvas.draw()
                 sleep(.1)
 
