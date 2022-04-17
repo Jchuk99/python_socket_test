@@ -101,7 +101,7 @@ class GroundStation:
     def update_obstacle_render(self):
         while self.connected:
             env_map = self.drone_clients.get_map_data()
-            vx,vy = self.drone_clients.get_calculated_velocity()
+            vx,vy,vx_adjust, vy_adjust = self.drone_clients.get_calculated_velocity()
             x,y,x_min,x_max,y_min,y_max = utils.find_radius(env_map.x, env_map.y)
             self.obstacle_ax.clear()
             if env_map.mapbytes:

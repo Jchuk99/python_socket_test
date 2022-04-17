@@ -20,6 +20,7 @@ from scipy.interpolate import interp1d
 
 sys.path.append(".")
 from PyLidar import PyLidar
+import utils
 from utils import LockedObject
 from utils import MapData
 import subprocess
@@ -68,8 +69,8 @@ class DroneMap:
     def update_map(self):
         self.slam = RMHC_SLAM(
             LaserModel(), 
-            MAP_SIZE_PIXELS, 
-            MAP_SIZE_METERS, 
+            utils.MAP_SIZE_PIXELS, 
+            utils.MAP_SIZE_METERS, 
             map_quality=65, 
             hole_width_mm= 400,
             max_search_iter=4250
@@ -80,7 +81,7 @@ class DroneMap:
         previous_angles    = None
 
         # Initialize empty map
-        mapbytes = bytearray(MAP_SIZE_PIXELS * MAP_SIZE_PIXELS)
+        mapbytes = bytearray(utils.MAP_SIZE_PIXELS * utils.MAP_SIZE_PIXELS)
 
         while self.running:
             items = self.current_lidar_reading

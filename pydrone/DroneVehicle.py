@@ -85,7 +85,8 @@ class DroneVehicle:
 
 		self.running = True
 		#find drone heading, adjust to face east and convert negative angles to positive
-		self.delta_theta = self.vehicle.heading - 90
+		self.delta_theta = 90 - self.vehicle.heading
+		logging.info('delta theta: {}'.format(self.delta_theta))
 		if self.delta_theta < 0:
 			self.delta_theta = 360 + self.delta_theta
 		
@@ -111,13 +112,14 @@ class DroneVehicle:
 
 			# Wait until the vehicle reaches a safe height before processing the goto (otherwise the command
 			#  after Vehicle.simple_takeoff will execute immediately).
+   
 			while True:
 				print(" Altitude: ", self.vehicle.location.global_relative_frame.alt)
 				#Break and return from function just below target altitude.
 				if self.vehicle.location.global_relative_frame.alt>=targetAlt*0.95:
 					print("Reached target altitude")
 					break
-				time.sleep(3)
+				time.sleep(1)
 			self.obstacle_detection()
     
 	def obstacle_detection(self):
@@ -170,24 +172,10 @@ class DroneVehicle:
 		self.vehicle.flush()
 	
 
-	def compassAdj(self,hyp,dx,dy):
-		orig = math.degrees(math.tan(-dy/-dx))
-
-		new_angle = orig - self.delta_theta
-
-		if new_angle < 0:
-			new_angle = 360 + new_angle
-
-		new_dx = hyp*math.acos(new_angle)
-		new_dy = hyp*math.asin(new_angle)
-
-		if new_angle > 90 and new_angle <= 180:
-			new_dx = -new_dx
-		elif new_angle > 180 and new_angle <= 270:
-			new_dx = -new_dx
-			new_dy = -new_dy
-		elif new_angle > 270 and new_angle < 360:
-			new_dy = -new_dy
+	def compassAdj(self, dx, dy):
+   
+		new_dx = dx * math.cos(math.radians(self.delta_theta)) - dy * math.sin(math.radians(self.delta_theta))
+		new_dy = dx * math.sin(math.radians(self.delta_theta)) + dy * math.cos(math.radians(self.delta_theta))
 
 		return new_dx,new_dy
 
@@ -229,22 +217,29 @@ class DroneVehicle:
 		red = .45
 
 		#function to adjust for drone heading
-		#dx, dy = self.compassAdj(hyp,dx,dy)
+		# dx, dy = self.compassAdj(hyp,dx,dy,quad)
 
 		#may need to uninvert dx and dy below when adding in the compass adjustment
 	
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
-  
-  
+
 		self.vx = vx
 		self.vy = vy
   
-		logging.info("east/west vel: {} \n north/south vel: {}".format(round(vx, 2), round(vy, 2)))
+		
+		logging.info("old east/west vel: {} \n old north/south vel: {}".format(round(vx, 2), round(vy, 2)))
+  
+		vx, vy = self.compassAdj(vx, vy)
+	
+		self.adjust_vx = vx
+		self.adjust_vy = vy
+  
+		logging.info("new east/west vel: {} \n new north/south vel: {}".format(round(vx, 2), round(vy, 2)))
   
 		#set velocity
 		if not self.debug:
-			self.setV(vy,vx,0)
+			self.setV(vx,-vy,0)
 			pass
 
 		print("\nvelociy is:" + str(round(vy,2))+ ", " + str(round(vx, 2)))
