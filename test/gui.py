@@ -29,8 +29,8 @@ class GroundStation:
 
         self.app = QApplication([])
         self.window = Window()
-        #self.drone_clients = DroneClients("10.0.0.238", 5050)
-        self.drone_clients = DroneClients("172.20.10.5", 5050)
+        self.drone_clients = DroneClients("10.0.0.238", 5050)
+        #self.drone_clients = DroneClients("172.20.10.5", 5050)
         # self.lidar = PyLidar("COM5", 115200)
         # # connects the lidar using the default port (tty/USB0)
         # self.lidar.connect()
@@ -107,13 +107,23 @@ class GroundStation:
         while self.connected:
             env_map = self.drone_clients.get_map_data()
             vx,vy = self.drone_clients.get_calculated_velocity()
-            print(str(vx) + " " + str(vy))
             x,y,x_min,x_max,y_min,y_max = utils.find_radius(env_map.x, env_map.y)
             self.obstacle_ax.clear()
             if env_map.mapbytes:
                 arr = [vx, vy]
+                #self.obstacle_ax.quiver(utils.RADIUS, utils.RADIUS, vx, vy, color='b', units='xy', scale=1)
                 self.obstacle_ax.imshow(env_map.get_occupancy_grid()[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
-                self.obstacle_ax.arrow(0, 0, *arr, head_width=0.05, head_length=0.1)
+                #self.obstacle_ax.arrow(utils.RADIUS, utils.RADIUS, vx, vy, head_width=0.15, head_length=0.20, facecolor='red', edgecolor='none')
+                radius_px = utils.RADIUS/utils.MAP_SCALE_METERS_PER_PIXEL
+                vx_px = vx/utils.MAP_SCALE_METERS_PER_PIXEL + radius_px
+                vy_px = vy/utils.MAP_SCALE_METERS_PER_PIXEL + radius_px
+                print(str(vx_px) + " " + str(vy_px))
+                self.obstacle_ax.annotate('hi', fontsize=20, xy=(vx_px , vy_px),
+                    xycoords='data', xytext=(radius_px, radius_px),
+                    arrowprops=dict(arrowstyle="->",
+                                linewidth = 5.,
+                                color = 'red')
+                 )
                 self.obstacle_canvas.draw()
                 sleep(.1)
 
@@ -122,9 +132,10 @@ class GroundStation:
         if not self.connected:
             self.connected = True
             self.drone_clients.run()
-            self.lidar_render_thread.start()
-            self.map_render_thread.start()
-            self.obstacle_render_thread.start()
+            if not self.lidar_render_thread.is_alive():
+                self.lidar_render_thread.start()
+                self.map_render_thread.start()
+                self.obstacle_render_thread.start()
         else:
             self.connected = False
             self.drone_clients.stop()
