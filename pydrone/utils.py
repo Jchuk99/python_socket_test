@@ -78,10 +78,11 @@ class Telemetry:
     def __str__(self):
         string = """altitude: {} m, pitch: {}, yaw: {}, roll: {},
             velocity: {}, airspeed: {}, groundspeed: {}, flight_mode: {}
+            vx: {}. vy:{}
             """.format(
             self.altitude, self.pitch, self.yaw, self.roll,
             self.velocity, self.airspeed, self.groundspeed, 
-            self.flight_mode,
+            self.flight_mode, self.vx, self.vy
         )
         return string
 
