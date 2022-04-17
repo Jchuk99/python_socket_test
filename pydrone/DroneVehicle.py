@@ -31,8 +31,11 @@ class DroneVehicle:
 		self.telemetry = utils.LockedObject()
 		self.telemetry = utils.Telemetry()
   
-		self.vx = utils.LockedObject()
-		self.vy = utils.LockedObject()
+		self.vx = 0.0
+		self.vy = 0.0
+
+		self.adjust_vx = 0.0
+		self.adjust_vy = 0.0
 
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
@@ -52,7 +55,9 @@ class DroneVehicle:
 				self.vehicle.groundspeed,
 				self.vehicle.mode.name,
 				self.vx,
-				self.vy
+				self.vy,
+				self.adjust_vx,
+				self.adjust_vy
 			)
 			#print(telemetry)
 			sleep(.15)

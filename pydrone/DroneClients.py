@@ -92,7 +92,9 @@ class DroneClients:
         return self.map_client.map
     
     def get_calculated_velocity(self):
-        return self.telemetry_client.telemetry.vx, self.telemetry_client.telemetry.vy
+
+        telemetry = self.telemetry_client.telemetry
+        return telemetry.vx, telemetry.vy, telemetry.adjust_vx, telemetry.adjust_vy
    
     # will be called on GUI event
     def send_command(self, msg):
