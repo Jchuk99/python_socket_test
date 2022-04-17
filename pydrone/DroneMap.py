@@ -70,8 +70,8 @@ class DroneMap:
             LaserModel(), 
             MAP_SIZE_PIXELS, 
             MAP_SIZE_METERS, 
-            map_quality=60, 
-            hole_width_mm=600,
+            map_quality=65, 
+            hole_width_mm= 400,
             max_search_iter=4250
             )
 

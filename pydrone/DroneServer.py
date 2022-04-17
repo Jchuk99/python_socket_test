@@ -111,7 +111,7 @@ class DroneServer:
 
         # get data
         telemetry = self.drone_vehicle.telemetry
-        print(telemetry)
+        #print(telemetry)
 
         # construct header message/transform numpy lidar readings to byte array
         byte_telemetry_data = pickle.dumps(telemetry)
