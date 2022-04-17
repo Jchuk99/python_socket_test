@@ -47,8 +47,8 @@ class TelemetryClient:
 
                 data_length = int(self.client.recv(utils.HEADER).decode('utf-8').strip())
                 self.telemetry = pickle.loads(self.client.recv(data_length))
-               # print(self.telemetry)
-                sleep(.1)
+                #print(self.telemetry)
+                sleep(.15)
             except (ConnectionAbortedError, OSError) as e:
                 print("user is breaking client connection.")
                 break
