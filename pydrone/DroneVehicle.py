@@ -31,8 +31,8 @@ class DroneVehicle:
 		self.telemetry = utils.LockedObject()
 		self.telemetry = utils.Telemetry()
   
-		self.vx = 0.0
-		self.vy = 0.0
+		self.vx = utils.LockedObject()
+		self.vy = utils.LockedObject()
 
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
@@ -54,9 +54,8 @@ class DroneVehicle:
 				self.vx,
 				self.vy
 			)
-			#print(self.telemetry)
+			#print(telemetry)
 			sleep(.15)
-
 
 
 	def run(self):
@@ -190,7 +189,7 @@ class DroneVehicle:
 		
 	def foundObj(self,dx,dy,theta,x_orig,y_orig):
     
-		print("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
+		logging.info("dy: "+ str(dy)+" dx: "+str(dx)+" x_orig: "+str(x_orig)+" y_orig: "+str(y_orig))
 
 
 		if(dx > 0 and dy > 0):
@@ -236,8 +235,8 @@ class DroneVehicle:
 		self.vx = vx
 		self.vy = vy
   
-		print("east/west vel: {} \nnorth/south vel: {}".format(vx, vy))
-		
+		logging.info("east/west vel: {} \n north/south vel: {}".format(round(vx, 2), round(vy, 2)))
+  
 		#set velocity
 		if not self.debug:
 			self.setV(vy,vx,0)
@@ -253,15 +252,12 @@ class DroneVehicle:
 			print('south')
 		elif(vy > 0):
 			print('north')
-		time.sleep(1)
 			
 	def returnToBase(self):
 		self.vehicle.mode = VehicleMode("RTL")
 	
 	def stopMov(self):
 		self.setV(0,0,0)
-		self.vx = 0.0
-		self.vy = 0.0
 		
 	def land(self):
 		self.vehicle.mode = VehicleMode("LAND")

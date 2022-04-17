@@ -105,14 +105,10 @@ class GroundStation:
             x,y,x_min,x_max,y_min,y_max = utils.find_radius(env_map.x, env_map.y)
             self.obstacle_ax.clear()
             if env_map.mapbytes:
-                arr = [vx, vy]
-                #self.obstacle_ax.quiver(utils.RADIUS, utils.RADIUS, vx, vy, color='b', units='xy', scale=1)
                 self.obstacle_ax.imshow(env_map.get_occupancy_grid()[y_min:y_max, x_min:x_max], cmap='gray', vmin=0, vmax=1)
-                #self.obstacle_ax.arrow(utils.RADIUS, utils.RADIUS, vx, vy, head_width=0.15, head_length=0.20, facecolor='red', edgecolor='none')
                 radius_px = utils.RADIUS/utils.MAP_SCALE_METERS_PER_PIXEL
                 vx_px = vx/utils.MAP_SCALE_METERS_PER_PIXEL + radius_px
                 vy_px = vy/utils.MAP_SCALE_METERS_PER_PIXEL + radius_px
-                print(str(vx_px) + " " + str(vy_px))
                 self.obstacle_ax.annotate('hi', fontsize=20, xy=(vx_px , vy_px),
                     xycoords='data', xytext=(radius_px, radius_px),
                     arrowprops=dict(arrowstyle="->",
