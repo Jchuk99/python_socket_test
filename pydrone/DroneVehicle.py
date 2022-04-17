@@ -31,8 +31,8 @@ class DroneVehicle:
 		self.telemetry = utils.LockedObject()
 		self.telemetry = utils.Telemetry()
   
-		self.vx = None
-		self.vy = None 
+		self.vx = utils.LockedObject()
+		self.vy = utils.LockedObject()
 
 		self.telemetry_thread = threading.Thread(target=self.read)
 		self.vehicle_thread = threading.Thread(target=self.start)
@@ -54,7 +54,8 @@ class DroneVehicle:
 				self.vx,
 				self.vy
 			)
-			sleep(2)
+			print(telemetry)
+			sleep(.15)
 
 
 	def run(self):
@@ -218,7 +219,6 @@ class DroneVehicle:
 		if hyp == 0:
 			self.stopMov()
 			print("\n no velocity is being sent")
-			self.stopMov()
 			return
 
 		red = .45
@@ -227,13 +227,16 @@ class DroneVehicle:
 		#dx, dy = self.compassAdj(hyp,dx,dy)
 
 		#may need to uninvert dx and dy below when adding in the compass adjustment
-		print("vx before red : {}".format(-dx/hyp))
+	
 		vx = (-dx/hyp)*red
 		vy = (-dy/hyp)*red
   
+  
 		self.vx = vx
 		self.vy = vy
-
+  
+		print("east/west vel: {} north/south vel: {}".format(vx, vy))
+  
 		#set velocity
 		if not self.debug:
 			self.setV(vy,vx,0)
