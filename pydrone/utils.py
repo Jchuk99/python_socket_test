@@ -4,9 +4,9 @@ import pandas as pd
 import threading
 import copy
 MAP_SIZE_PIXELS         = 500
-MAP_SIZE_METERS         = 10
+MAP_SIZE_METERS         = 20
 MAP_SCALE_METERS_PER_PIXEL = MAP_SIZE_METERS / float(MAP_SIZE_PIXELS)
-RADIUS = .5
+RADIUS = .75
 HEADER = 64
 
 # MESSAGE PROTOCOL:
